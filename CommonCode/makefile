@@ -33,20 +33,20 @@ library/JetProducer.o: source/JetProducer.cpp include/JetProducer.h
 
 binary/DHAdd: source/DHAdd.cpp
 	mkdir -p binary
-	g++ source/DHAdd.cpp -o binary/DHAdd -I.
+	g++ source/DHAdd.cpp -o binary/DHAdd -I. -Iinclude
 
 binary/DHRemove: source/DHRemove.cpp
 	mkdir -p binary
-	g++ source/DHRemove.cpp -o binary/DHRemove -I.
+	g++ source/DHRemove.cpp -o binary/DHRemove -I. -Iinclude
 
 binary/DHQuery: source/DHQuery.cpp
 	mkdir -p binary
-	g++ source/DHQuery.cpp -o binary/DHQuery -I.
+	g++ source/DHQuery.cpp -o binary/DHQuery -I. -Iinclude
 
 binary/DHSet: source/DHSet.cpp
 	mkdir -p binary
-	g++ source/DHSet.cpp -o binary/DHSet -I.
+	g++ source/DHSet.cpp -o binary/DHSet -I. -Iinclude
 
 binary/Reformat: source/Reformat.cpp
 	mkdir -p binary
-	g++ source/Reformat.cpp -o binary/Reformat -I.
+	g++ source/Reformat.cpp -o binary/Reformat -I. -Iinclude
