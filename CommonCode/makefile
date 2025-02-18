@@ -4,7 +4,7 @@ FJContrib = /cvmfs/cms.cern.ch/slc7_amd64_gcc900/external/fastjet-contrib/1.044-
 
 default: all
 
-all: library/Messenger.o library/TauHelperFunctions3.o library/DrawRandom.o library/DrawRandom2.o binary/DHAdd binary/DHSet binary/DHQuery binary/DHRemove binary/Reformat
+all: library/Messenger.o library/TauHelperFunctions3.o library/DrawRandom.o library/DrawRandom2.o binary/DHAdd binary/DHSet binary/DHQuery binary/DHRemove binary/Reformat binary/AddConst
 
 # all: library/Messenger.o library/RhoCalculator.o library/JetProducer.o library/TauHelperFunction3.o library/DrawRandom.o library/DrawRandom2.o
 
@@ -50,3 +50,9 @@ binary/DHSet: source/DHSet.cpp
 binary/Reformat: source/Reformat.cpp
 	mkdir -p binary
 	g++ source/Reformat.cpp -o binary/Reformat -I. -Iinclude
+
+binary/AddConst: source/AddConst.cpp
+	mkdir -p binary
+	g++ source/AddConst.cpp -o binary/AddConst -I. -Iinclude
+
+
