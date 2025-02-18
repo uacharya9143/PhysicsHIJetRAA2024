@@ -4,7 +4,7 @@ FJContrib = /cvmfs/cms.cern.ch/slc7_amd64_gcc900/external/fastjet-contrib/1.044-
 
 default: all
 
-all: library/Messenger.o library/TauHelperFunctions3.o library/DrawRandom.o library/DrawRandom2.o
+all: library/Messenger.o library/TauHelperFunctions3.o library/DrawRandom.o library/DrawRandom2.o binary/DHAdd binary/DHSet binary/DHQuery binary/DHRemove
 
 # all: library/Messenger.o library/RhoCalculator.o library/JetProducer.o library/TauHelperFunction3.o library/DrawRandom.o library/DrawRandom2.o
 
@@ -30,3 +30,19 @@ library/JetProducer.o: source/JetProducer.cpp include/JetProducer.h
 		`$(FastJetConfig) --cxxflags` -I$(FJContrib)/include \
 		-I$(RootMacrosBase) \
 		`root-config --cflags` -std=c++17
+
+binary/DHAdd: source/DHAdd.cpp
+	mkdir -p binary
+	g++ source/DHAdd.cpp -o binary/DHAdd -I.
+
+binary/DHRemove: source/DHRemove.cpp
+	mkdir -p binary
+	g++ source/DHRemove.cpp -o binary/DHRemove -I.
+
+binary/DHQuery: source/DHQuery.cpp
+	mkdir -p binary
+	g++ source/DHQuery.cpp -o binary/DHQuery -I.
+
+binary/DHSet: source/DHSet.cpp
+	mkdir -p binary
+	g++ source/DHSet.cpp -o binary/DHSet -I.

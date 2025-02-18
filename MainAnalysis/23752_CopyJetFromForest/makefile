@@ -46,14 +46,14 @@ ULTreeValidation: Execute
 	bash RunULValidation.sh
 
 Execute: ProcessJets.cpp
-	CompileRootMacro ProcessJets.cpp Execute \
+	g++ `root-config --cflags --libs` ProcessJets.cpp -o Execute \
 		-I$(ProjectBase)/CommonCode/include \
 		$(ProjectBase)/CommonCode/library/*.o \
 		`$(FastJet) --cxxflags --libs` \
 		-L$(FJContrib)/lib -I$(FJContrib)/include -lConstituentSubtractor
 
 ExecuteVector: ProcessJetsVector.cpp
-	CompileRootMacro ProcessJetsVector.cpp ExecuteVector \
+	g++ `root-config --cflags --libs` ProcessJetsVector.cpp -o ExecuteVector \
 		-I$(ProjectBase)/CommonCode/include \
 		$(ProjectBase)/CommonCode/library/*.o \
 		`$(FastJet) --cxxflags --libs` \
