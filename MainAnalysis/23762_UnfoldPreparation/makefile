@@ -28,7 +28,7 @@ Debug:
 	DHQuery GlobalSetting.dh Binning GenPT
 
 RunAA: Execute ExecutePreset
-	#bash RunFileAA_MC.sh
+	bash RunFileAA_MC.sh
 	bash RunFileAA_Data_Sys.sh
 
 RunAAMCCentrality: Execute ExecutePreset
