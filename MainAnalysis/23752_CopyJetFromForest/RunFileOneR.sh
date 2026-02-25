@@ -69,53 +69,54 @@ fi
 RValue=`DHQuery GlobalSetting.dh JetR $RTag`
 
 JECBase="$ProjectBase/CommonCode/jec/"
-JECTag="Autumn18_HI_RAAV2_MC"
+#JECTag="Autumn18_HI_RAAV2_MC"
+JECTag="Summer2024_ppRef5p36TeV_MC"
 # PhiTag="Phi_24151"
 PhiTag="Phi_24252"
 
 if [[ "$IsMC" == "1" ]] && [[ "$IsPP" == "0" ]]; then
-   JECTag="Autumn18_HI_RAAV3_MC"
+   #JECTag="Autumn18_HI_RAAV3_MC"
+   JECTag="Summer2024_PbPb5p36TeV_MC"
 elif [[ "$IsMC" == "0" ]] && [[ "$IsPP" == "0" ]]; then
-   JECTag="Autumn18_HI_RAAV3_DATA"
+   JECTag="Summer2024_PbPb5p36TeV_MC"
 elif [[ "$IsMC" == "1" ]] && [[ "$IsPP" == "1" ]]; then
-   JECTag="Spring18_ppRef5TeV_RAAV3_MC"
+   JECTag="Summer2024_ppRef5p36TeV_MC"
+   #JECTag="Spring18_ppRef5TeV_RAAV3_MC"
 elif [[ "$IsMC" == "0" ]] && [[ "$IsPP" == "1" ]]; then
-   JECTag="Spring18_ppRef5TeV_RAAV3_DATA"
+   JECTag="Summer2024_ppRef5p36TeV_MC"
 elif [[ "$IsMC" == "1" ]] && [[ "$IsPP" == "2" ]]; then
-   JECTag="Summer20UL17_ppRef5TeV_RAAV2_MC"
+    JECTag="Summer2024_ppRef5p36TeV_MC"
+  #JECTag="Summer20UL17_ppRef5TeV_RAAV2_MC"
 elif [[ "$IsMC" == "0" ]] && [[ "$IsPP" == "2" ]]; then
    JECTag="Summer20UL17_ppRef5TeV_RAAV2_DATA"
 fi
 
+#JEC=""
+
 JEC="$JECBase/$JECTag/${JECTag}_L2Relative_AK${RTag}PF.txt"
-if [[ "$DoPhiResidual" == 1 ]]; then
-   # JEC="$JEC,$JECBase/$PhiTag/PhiCorrectionGen_AK${RTag}PF.txt"
-   JEC="$JEC,$JECBase/$PhiTag/PhiCorrectionGenLowNoThreshold_AK${RTag}PF.txt"
-   # JEC="$JEC,$JECBase/$PhiTag/PhiCorrectionGenLowNoThresholdScale_AK${RTag}PF.txt"
-fi
+
+#if [[ "$DoPhiResidual" == 1 ]]; then
+#   JEC="$JEC,$JECBase/$PhiTag/PhiCorrectionGenLowNoThreshold_AK${RTag}PF.txt"
+#fi
 if [[ "$DoDataResidual" == 1 ]]; then
    JEC="$JEC,$JECBase/$JECTag/${JECTag}_L2L3Residual_AK${RTag}PF.txt"
 fi
 
-# if [[ "$DoDataResidual" == "0" ]] && [[ "$DoPhiResidual" == 1 ]]; then
-#    JEC="$JECBase/$JECTag/${JECTag}_L2Relative_AK${RTag}PF.txt","$JECBase/$PhiTag/PhiCorrectionGen_AK${RTag}PF.txt"
-# elif [[ "$DoDataResidual" == "1" ]] && [[ "$DoPhiResidual" == 1 ]]; then
-#    JEC="$JECBase/$JECTag/${JECTag}_L2Relative_AK${RTag}PF.txt","$JECBase/$PhiTag/PhiCorrectionGen_AK${RTag}PF.txt","$JECBase/$JECTag/${JECTag}_L2L3Residual_AK${RTag}PF.txt"
-# elif [[ "$DoDataResidual" == "0" ]] && [[ "$DoPhiResidual" == 0 ]]; then
-#    JEC="$JECBase/$JECTag/${JECTag}_L2Relative_AK${RTag}PF.txt"
-# elif [[ "$DoDataResidual" == "1" ]] && [[ "$DoPhiResidual" == 0 ]]; then
-#    JEC="$JECBase/$JECTag/${JECTag}_L2Relative_AK${RTag}PF.txt","$JECBase/$JECTag/${JECTag}_L2L3Residual_AK${RTag}PF.txt"
-# fi
 
 Exclusion=`DHQuery GlobalSetting.dh Binning JetExclusion | tr -d '"'`
 if [[ "$DoExclusion" == 0 ]]; then
    Exclusion="99,100,99,100"
 fi
 
-JEU=$JECBase/$JECTag/${JECTag}_Uncertainty_AK${RTag}PF.txt
+#JEU=""
+
+JEU="$JECBase/$JECTag/${JECTag}_Uncertainty_AK${RTag}PF.txt"
 
 echo $JEC
 echo $JEU
+#echo "JEC (DISABLED): $JEC"
+#echo "JEU: $JEU"
+#echo "NOTE: Running without JEC corrections to study uncorrected jets"
 
 BaselineCutAA=false
 if [[ "$IsMC" == "0" ]] && [[ "$IsPP" == "0" ]]; then
@@ -207,8 +208,8 @@ do
       SkipMatch=false
    fi
 
-   mkdir -p /tmp/chenyi/
-   echo ./Execute --Input $InputFile --Output /tmp/chenyi/${Tag}_R${RTag}_Centrality${CTag}.root \
+   mkdir -p /tmp/uacharya/
+   echo ./Execute --Input $InputFile --Output /tmp/uacharya/${Tag}_R${RTag}_Centrality${CTag}.root \
        --JetR $RValue --Jet "${Jet}" --JEC ${JEC} --JEU ${JEU} \
        --Fraction $Fraction --Exclusion "$Exclusion" --KeepSkippedEvent $KeepSkipped \
        --UseStoredGen $Stored --UseStoredReco $Stored --DoRecoSubtraction false --Trigger $Trigger \
@@ -218,7 +219,7 @@ do
        --DHFile GlobalSetting.dh --RhoKeyBase $RhoKey --CutUE true \
        --ReEvaluateCentrality $ReEvaluateCentrality --CentralityShift $CentralityShift \
        --DoJetID $DoJetID --JetIDKeyBase ${JetIDTag}_R${RTag}_Centrality${CTag}
-   ./Execute --Input $InputFile --Output /tmp/chenyi/${Tag}_R${RTag}_Centrality${CTag}.root \
+   ./Execute --Input $InputFile --Output /tmp/uacharya/${Tag}_R${RTag}_Centrality${CTag}.root \
       --JetR $RValue --Jet "${Jet}" --JEC ${JEC} --JEU ${JEU} \
       --Fraction $Fraction --Exclusion "$Exclusion" --KeepSkippedEvent $KeepSkipped \
       --UseStoredGen $Stored --UseStoredReco $Stored --DoRecoSubtraction false --Trigger $Trigger \
@@ -228,7 +229,19 @@ do
       --DHFile GlobalSetting.dh --RhoKeyBase $RhoKey --CutUE true \
       --ReEvaluateCentrality $ReEvaluateCentrality --CentralityShift $CentralityShift \
       --DoJetID $DoJetID --JetIDKeyBase ${JetIDTag}_R${RTag}_Centrality${CTag}
-   mv /tmp/chenyi/${Tag}_R${RTag}_Centrality${CTag}.root Output/${Tag}_R${RTag}_Centrality${CTag}.root
+
+   #mv /tmp/uacharya/${Tag}_R${RTag}_Centrality${CTag}.root Output_PPMC_R4/${Tag}_R${RTag}_Centrality${CTag}.root
+   mv /tmp/uacharya/${Tag}_R${RTag}_Centrality${CTag}.root Output_PPData_R4/${Tag}_R${RTag}_Centrality${CTag}.root
+   #mv /tmp/uacharya/${Tag}_R${RTag}_Centrality${CTag}.root Output_PbPbData_PPData/${Tag}_R${RTag}_Centrality${CTag}.root
+  #mv /tmp/uacharya/${Tag}_R${RTag}_Centrality${CTag}.root Output_PbPbData_CentralityUp/${Tag}_R${RTag}_Centrality${CTag}.root
+  # mv /tmp/uacharya/${Tag}_R${RTag}_Centrality${CTag}.root Output_PbPbData_CentralityDown/${Tag}_R${RTag}_Centrality${CTag}.root
+   #mv /tmp/uacharya/${Tag}_R${RTag}_Centrality${CTag}.root Output_PbPbMC/${Tag}_R${RTag}_Centrality${CTag}.root
+   #mv /tmp/uacharya/${Tag}_R${RTag}_Centrality${CTag}.root Output_PPMC/${Tag}_R${RTag}_Centrality${CTag}.root
+   #mv /tmp/uacharya/${Tag}_R${RTag}_Centrality${CTag}.root Output_PbPbMCRho/${Tag}_R${RTag}_Centrality${CTag}.root
+   #mv /tmp/uacharya/${Tag}_R${RTag}_Centrality${CTag}.root Output_PbPbData_JEU/${Tag}_R${RTag}_Centrality${CTag}.root
+  #mv /tmp/uacharya/${Tag}_R${RTag}_Centrality${CTag}.root Output_PPRef_Data/${Tag}_R${RTag}_Centrality${CTag}.root
+   #mv /tmp/uacharya/${Tag}_R${RTag}_Centrality${CTag}.root Output_PbPbData_R4/${Tag}_R${RTag}_Centrality${CTag}.root
+
 done
 
 
