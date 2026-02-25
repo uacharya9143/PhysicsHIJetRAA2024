@@ -46,19 +46,23 @@ int main(int argc, char *argv[])
 
 void AppendPlot(PdfFileHelper &PdfFile, DataHelper &DHFile, string State, double Percentage)
 {
-   vector<string> R{"1", "2", "3", "4", "5", "6", "7", "8", "9"};
+  // vector<string> R{"1", "2", "3", "4", "5", "6", "7", "8", "9"};
+   vector<string> R{"1", "2", "3", "4", "6", "7", "8", "9"};
    vector<string> C{"0to10", "10to30", "30to50", "50to90", "Inclusive"};
-   vector<string> RLabel{"0.15", "0.20", "0.30", "0.40", "0.50", "0.60", "0.80", "1.00", "1.20"};
+   //vector<string> RLabel{"0.15", "0.20", "0.30", "0.40", "0.50", "0.60", "0.80", "1.00", "1.20"};
+   vector<string> RLabel{"0.15", "0.20", "0.30", "0.40", "0.60", "0.80", "1.00", "1.20"};
    vector<string> CLabel{"0-10", "10-30", "30-50", "50-90", "pp"};
 
    TH2D H(Form("H%f", Percentage), Form("P = %.1f%%", Percentage * 100), 9, 0, 9, 5, 0, 5);
    H.SetStats(0);
-   for(int iR = 0; iR < 9; iR++)
+   //for(int iR = 0; iR < 9; iR++)
+   for(int iR = 0; iR < 8; iR++)
       H.GetXaxis()->SetBinLabel(iR + 1, RLabel[iR].c_str());
    for(int iC = 0; iC < 5; iC++)
       H.GetYaxis()->SetBinLabel(iC + 1, CLabel[iC].c_str());
 
-   for(int iR = 0; iR < 9; iR++)
+   //for(int iR = 0; iR < 9; iR++)
+   for(int iR = 0; iR < 8; iR++)
    {
       for(int iC = 0; iC < 5; iC++)
       {

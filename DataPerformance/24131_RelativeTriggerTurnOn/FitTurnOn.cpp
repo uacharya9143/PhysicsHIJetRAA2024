@@ -50,11 +50,14 @@ int main(int argc, char *argv[])
    if(FunctionChoice == 1)
       Function = "1+[0]*(TMath::Erf((x-[1])/[2])-1)";
 
-   TF1 F("F", Function.c_str(), 0, 500);
+   //TF1 F("F", Function.c_str(), 0, 500); //disabled by uttam to check the fit range
+   TF1 F("F", Function.c_str(), 0, 900);
    F.SetParameters(0.5, 80, 20);
 
-   G.Fit(&F, "w", "", 80, 500);
-   G.Fit(&F, "", "", 80, 500);
+   //G.Fit(&F, "w", "", 80, 500); //disabled by uttam to check the fit range
+   //G.Fit(&F, "", "", 80, 500); //disabled by uttam to check the fit range
+   G.Fit(&F, "w", "", 80, 900);
+   G.Fit(&F, "", "", 80, 900);
 
    HAll->SetLineColor(Colors[0]);
    HPass->SetLineColor(Colors[1]);
