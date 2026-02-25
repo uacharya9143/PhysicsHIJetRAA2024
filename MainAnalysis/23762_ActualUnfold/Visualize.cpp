@@ -13,7 +13,7 @@ using namespace std;
 #include "SetStyle.h"
 #include "PlotHelper4.h"
 #include "CommandLine.h"
-#include "RootUtilities.h"
+//#include "RootUtilities.h"
 
 #include "BinHelper.h"
 
@@ -22,7 +22,7 @@ void AddResponsePlot(PdfFileHelper &PdfFile, TH2D *HResponse);
 
 int main(int argc, char *argv[])
 {
-   SilenceRoot();
+  //SilenceRoot();
 
    vector<int> Colors = GetPrimaryColors();
    SetThesisStyle();
@@ -79,6 +79,9 @@ int main(int argc, char *argv[])
       H->SetLineWidth(2);
       H->SetLineColor(Colors[1]);
 
+      HMCTruth->Scale(H->Integral(Ignore, -1) / HMCTruth->Integral(Ignore, -1));
+      HMCTruth->SetTitle(Form("Bayes unfold with iteration = %s", Name.substr(14).c_str()));
+
       TH1D *HFold = ForwardFold(H, HResponse);
       HFold->SetMarkerStyle(20);
       HFold->SetMarkerColor(Colors[1]);
@@ -101,9 +104,7 @@ int main(int argc, char *argv[])
       // cout << "ScaleFold = " << HInput->Integral(Ignore, -1) / HFold->Integral(Ignore, -1) << endl;
       // cout << "ScaleUnfold = " << H->Integral(Ignore, -1) / HMCTruth->Integral(Ignore, -1) << endl;
 
-      HMCTruth->Scale(H->Integral(Ignore, -1) / HMCTruth->Integral(Ignore, -1));
-      HMCTruth->SetTitle(Form("Bayes unfold with iteration = %s", Name.substr(14).c_str()));
-
+ 
       TCanvas Canvas;
       HMCTruth->Draw("hist");
       H->Draw("hist same");
@@ -133,6 +134,7 @@ int main(int argc, char *argv[])
       Canvas.SetLogy(false);
       PdfFile.AddCanvas(Canvas);
 
+
       // HFold->Scale(HInput->Integral(Ignore, -1) / HFold->Integral(Ignore, -1));
       // HGenFold->Scale(HInput->Integral(Ignore, -1) / HGenFold->Integral(Ignore, -1));
       // HInputFold->Scale(HInput->Integral(Ignore, -1) / HInputFold->Integral(Ignore, -1));
@@ -154,6 +156,37 @@ int main(int argc, char *argv[])
       RecoLegend.Draw();
       
       Canvas.SetLogy();
+      PdfFile.AddCanvas(Canvas);
+
+
+      TH1D *HRatio_Input_FolUnFold=(TH1D *)HInput->Clone((Name+"Ratio").c_str());
+      HRatio_Input_FolUnFold->Divide(HFold);
+      HRatio_Input_FolUnFold->SetMaximum(5);
+      HRatio_Input_FolUnFold->SetMinimum(0);
+      HRatio_Input_FolUnFold->SetMarkerColor(Colors[4]);
+      HRatio_Input_FolUnFold->SetMarkerStyle(24);
+      HRatio_Input_FolUnFold->SetLineColor(Colors[4]);
+      
+      TH1D *HRatio_Input_FolMCTruth=(TH1D *)HInput->Clone((Name+"Ratio").c_str());
+      HRatio_Input_FolMCTruth->Divide(HGenFold);
+      HRatio_Input_FolMCTruth->SetMaximum(5);
+      HRatio_Input_FolMCTruth->SetMinimum(0);
+      HRatio_Input_FolMCTruth->SetMarkerColor(Colors[2]);
+      HRatio_Input_FolMCTruth->SetLineColor(Colors[2]);
+      HRatio_Input_FolMCTruth->Draw();
+      HRatio_Input_FolUnFold->Draw("same");
+      TLegend RatLegend(0.3, 0.65, 0.4, 0.8);
+      RatLegend.SetTextFont(42);
+      RatLegend.SetTextSize(0.035);
+      RatLegend.SetBorderSize(0);
+      RatLegend.SetFillStyle(0);
+      RatLegend.AddEntry(HRatio_Input_FolUnFold, "Input/Folded_Unfolded", "l");
+      RatLegend.AddEntry(HRatio_Input_FolMCTruth, "Input/Folded_MCTruth", "l");
+      RatLegend.Draw();
+  
+      //G1.Draw("l");
+      //G2.Draw("l");
+      Canvas.SetLogy(false);
       PdfFile.AddCanvas(Canvas);
    }
 

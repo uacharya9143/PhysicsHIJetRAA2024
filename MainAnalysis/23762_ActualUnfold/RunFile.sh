@@ -6,7 +6,9 @@ Suffix=$3
 IsPP=$4
 PriorChoice=$5
 
-JetR=`DHQuery GlobalSetting.dh Global JetR | sed 's/"//g'`
+#JetR=`DHQuery GlobalSetting.dh Global JetR | sed 's/"//g'`
+#JetR="1 2 3 4 6 7 8 9"; \
+JetR="4"; \
 Centrality=`DHQuery GlobalSetting.dh Global Centrality | sed 's/"//g'`
 if [[ "$IsPP" == "1" ]]; then
    Centrality="Inclusive"
@@ -47,7 +49,7 @@ do
       elif [[ "$Prior" == "External" ]]; then
          PriorString="External"
          # Use nominal for now.  Can upgrade later if needed
-         PriorFile=Output/`DHQuery GlobalSetting.dh Prior ${Prefix}_R${R}_Centrality${C}_${PriorChoice}_File | tr -d '"'`
+         PriorFile=Output_R4/`DHQuery GlobalSetting.dh Prior ${Prefix}_R${R}_Centrality${C}_${PriorChoice}_File | tr -d '"'`
          PriorHistogram=`DHQuery GlobalSetting.dh Prior ${Prefix}_R${R}_Centrality${C}_${PriorChoice}_Histogram | tr -d '"'`
          PriorExtra="--ExternalPriorFile $PriorFile --ExternalPriorHistogram $PriorHistogram"
       fi
@@ -56,7 +58,7 @@ do
       # if [[ "$Suffix" == "Nominal" ]] && [[ "$PriorChoice" == "Nominal" ]]; then
       #    DoToyError=true
       # fi
-
+      DoFakeRate=false
       echo "Unfolding now with R$R, Centrality $C, Prefix $Prefix, Suffix $Suffix and prior $Prior ($PriorChoice)"
       # echo Input file = $Location/${Prefix}_R${R}_Centrality${C}_${Suffix}.root
 
@@ -65,12 +67,12 @@ do
       OutputSuffix="${PriorChoice}Prior"
 
       ./Execute --Input $Location/${Prefix}_R${R}_Centrality${C}_${Suffix}.root \
-         --Output Output/${Prefix}_R${R}_Centrality${C}_${Suffix}_${OutputSuffix}.root \
+         --Output Output_R4/${Prefix}_R${R}_Centrality${C}_${Suffix}_${OutputSuffix}.root \
          --Prior $PriorString $PriorExtra --DoToyError $DoToyError \
-         --DoBayes true --DoSVD false --DoInvert true --DoTUnfold true --DoFit true
+         --DoBayes true --DoSVD false --DoInvert true --DoTUnfold true --DoFit true --DoFakeRate false
          # --FoldNormalize true --Ignore $Ignore --DoToyError $DoToyError
-      ./ExecutePlot --Input Output/${Prefix}_R${R}_Centrality${C}_${Suffix}_${OutputSuffix}.root \
-         --Output Plots/${Prefix}_R${R}_Centrality${C}_${Suffix}_${OutputSuffix}.pdf \
+      ./ExecutePlot --Input Output_R4/${Prefix}_R${R}_Centrality${C}_${Suffix}_${OutputSuffix}.root \
+         --Output Plots_R4/${Prefix}_R${R}_Centrality${C}_${Suffix}_${OutputSuffix}.pdf \
          --Ignore $Ignore
    done
 

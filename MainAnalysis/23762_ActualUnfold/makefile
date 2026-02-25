@@ -3,8 +3,14 @@ default: RunTest
 
 Prepare:
 	rm -f Input ToyInput
-	ln -sf $(ProjectBase)/MainAnalysis/24236_RebinUnfoldInput//Output/ Input
-	ln -sf $(ProjectBase)/MainAnalysis/23762_FakeData/Output/ ToyInput
+	ln -sf $(ProjectBase)/MainAnalysis/24236_RebinUnfoldInput//Output_R4/ Input
+	ln -sf $(ProjectBase)/MainAnalysis/23762_FakeData/Output_R4/ ToyInput
+	ln -sf $(ProjectBase)/MainAnalysis/23762_UnfoldPreparation/Output_R4/ InputUncert
+
+# 	ln -sf $(ProjectBase)/MainAnalysis/24236_RebinUnfoldInput//Output/ Input
+# 	ln -sf $(ProjectBase)/MainAnalysis/23762_FakeData/Output/ ToyInput
+# 	ln -sf $(ProjectBase)/MainAnalysis/23762_UnfoldPreparation/Output/ InputUncert
+
 	ln -sf $(ProjectBase)/MainAnalysis/GlobalSetting/GlobalSetting.dh
 	mkdir -p Output Plots
 
@@ -13,10 +19,20 @@ Clean:
 	rm -f Plots/*pdf
 
 Execute: Unfold1D.cpp
-	CompileRootMacro Unfold1D.cpp Execute -lUnfold
+	 g++ Unfold1D.cpp -o Execute -lRooUnfold  `root-config --libs --cflags` \
+	-L$(ProjectBase)/RooUnfold \
+	-I$(ProjectBase)/CommonCode/include \
+	-I$(ProjectBase)/RooUnfold/src \
+	$(ProjectBase)/CommonCode/library/*.o 
+	#$(ProjectBase)/RooUnfold/build/libRooUnfold.so 
 
 ExecutePlot: Visualize.cpp
-	CompileRootMacro Visualize.cpp ExecutePlot -I../../CommonCode/include/
+	 g++ Visualize.cpp -o ExecutePlot  `root-config --libs --cflags` \
+	-L$(ProjectBase)/RooUnfold \
+	-I$(ProjectBase)/CommonCode/include \
+	-I$(ProjectBase)/RooUnfold/src \
+	$(ProjectBase)/CommonCode/library/*.o 
+	#$(ProjectBase)/RooUnfold/build/libRooUnfold.so 
 
 RunMCToy: Execute ExecutePlot
 	bash RunFile.sh ToyInput PPMC      Nominal_Toy                   1 DefaultStep1
@@ -40,27 +56,27 @@ RunDataStep2Toy: Execute ExecutePlot
 
 RunAAStep1: Execute ExecutePlot
 	bash RunFile.sh Input    PbPbMCRho Nominal                       0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  JECUp                         0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  JECDown                       0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  JECAggressiveUp               0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  JECAggressiveDown             0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  JECQuench                     0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  JERUp                         0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  JERDown                       0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  FlatJER                       0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  NoJER                         0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  CentralityUp                  0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  CentralityDown                0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  MCCentrality                  0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  StoredCentrality              0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  JECNoResidual                 0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  JECNoPhi                      0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  NominalEarthquake             0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  NominalCleaned                0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  NominalCleanedStrong          0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  NominalBinBiasUp              0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  NominalBinBiasDown            0 DefaultStep1
-	bash RunFile.sh Input    PbPbData  NoJetID                       0 DefaultStep1
+	bash RunFile.sh InputUncert    PbPbData  JECUp                         0 DefaultStep1
+	bash RunFile.sh InputUncert    PbPbData  JECDown                       0 DefaultStep1
+	bash RunFile.sh InputUncert    PbPbData  JERUp                         0 DefaultStep1
+	bash RunFile.sh InputUncert    PbPbData  JERDown                       0 DefaultStep1
+	#bash RunFile.sh Input    PbPbData  JECAggressiveUp               0 DefaultStep1
+	#bash RunFile.sh Input    PbPbData  JECAggressiveDown             0 DefaultStep1
+	#bash RunFile.sh Input    PbPbData  JECQuench                     0 DefaultStep1
+	#bash RunFile.sh Input    PbPbData  FlatJER                       0 DefaultStep1
+	#bash RunFile.sh Input    PbPbData  NoJER                         0 DefaultStep1
+	#bash RunFile.sh Input    PbPbData  CentralityUp                  0 DefaultStep1
+	#bash RunFile.sh Input    PbPbData  CentralityDown                0 DefaultStep1
+	#bash RunFile.sh Input    PbPbData  MCCentrality                  0 DefaultStep1
+	#bash RunFile.sh Input    PbPbData  StoredCentrality              0 DefaultStep1
+	#bash RunFile.sh Input    PbPbData  JECNoResidual                 0 DefaultStep1
+	#bash RunFile.sh Input    PbPbData  JECNoPhi                      0 DefaultStep1
+	#bash RunFile.sh Input    PbPbData  NominalEarthquake             0 DefaultStep1
+	#bash RunFile.sh Input    PbPbData  NominalCleaned                0 DefaultStep1
+	#bash RunFile.sh Input    PbPbData  NominalCleanedStrong          0 DefaultStep1
+	#bash RunFile.sh Input    PbPbData  NominalBinBiasUp              0 DefaultStep1
+	#bash RunFile.sh Input    PbPbData  NominalBinBiasDown            0 DefaultStep1
+	#bash RunFile.sh Input    PbPbData  NoJetID                       0 DefaultStep1#disabled for now no Input//Uttam
 
 RunAAStep2: Execute ExecutePlot
 	bash RunFile.sh Input    PbPbMCRho Nominal                       0 DefaultStep1
@@ -86,13 +102,13 @@ RunAAStep2: Execute ExecutePlot
 
 RunPPStep1: Execute ExecutePlot
 	bash RunFile.sh Input    PPMC      Nominal                       1 DefaultStep1
-	bash RunFile.sh Input    PPData    JECUp                         1 DefaultStep1
-	bash RunFile.sh Input    PPData    JECDown                       1 DefaultStep1
-	bash RunFile.sh Input    PPData    JERUp                         1 DefaultStep1
-	bash RunFile.sh Input    PPData    JERDown                       1 DefaultStep1
-	bash RunFile.sh Input    PPData    JECAggressiveUp               1 DefaultStep1
-	bash RunFile.sh Input    PPData    JECAggressiveDown             1 DefaultStep1
-	
+	bash RunFile.sh InputUncert    PPData    JECUp                         1 DefaultStep1
+	bash RunFile.sh InputUncert    PPData    JECDown                       1 DefaultStep1
+	bash RunFile.sh InputUncert    PPData    JERUp                         1 DefaultStep1
+	bash RunFile.sh InputUncert    PPData    JERDown                       1 DefaultStep1
+	#bash RunFile.sh Input    PPData    JECAggressiveUp               1 DefaultStep1
+	#bash RunFile.sh Input    PPData    JECAggressiveDown             1 DefaultStep1#disabled for now no Input//input
+
 RunPPStep2: Execute ExecutePlot
 	bash RunFile.sh Input    PPMC      Nominal                       1 DefaultStep1
 	bash RunFile.sh Input    PPData    JECUp                         1 DefaultStep2

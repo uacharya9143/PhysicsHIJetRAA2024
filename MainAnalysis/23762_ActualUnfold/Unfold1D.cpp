@@ -18,15 +18,16 @@ using namespace std;
 #include "RooUnfoldBayes.h"
 #include "RooUnfoldSvd.h"
 // #include "TUnfold.h"
-#include "TUnfoldDensity.h"
+//#include "TUnfoldDensity.h"
 
-#include "RootUtilities.h"
+//include "RootUtilities.h"
 #include "CommandLine.h"
 #include "CustomAssert.h"
 
 class Spectrum;
 int main(int argc, char *argv[]);
 vector<double> DetectBins(TH1D *HMin, TH1D *HMax);
+void GetfakeRate(TH1D *HInput,TH1D *HMeasured,TH1D *HMatched);
 void RemoveOutOfRange(TH1D *H);
 void RemoveOutOfRange(TH2D *HResponse);
 void ReweightResponse(TH2D *HResponse, TH1D *HPrior, bool NormalizePrior = true);
@@ -180,15 +181,17 @@ public:
 
 int main(int argc, char *argv[])
 {
-   SilenceRoot();
+  //SilenceRoot();
 
    CommandLine CL(argc, argv);
 
    string InputFileName    = CL.Get("Input",             "Input/DataJetPNominal.root");
+   //string InputFileName    = CL.Get("Input",             "Input/*.root");
    string DataName         = CL.Get("InputName",         "HDataReco");
    string ResponseName     = CL.Get("ResponseName",      "HResponse");
    string ResponseTruth    = CL.Get("ResponseTruth",     "HMCGen");
    string ResponseMeasured = CL.Get("ResponseMeasured",  "HMCReco");
+   string ResponseMatched = CL.Get("ResponseMatched",    "HMCMatched");
    string Output           = CL.Get("Output",            "Unfolded.root");
    string PriorChoice      = CL.Get("Prior",             "Original");
    bool DoBayes            = CL.GetBool("DoBayes",       true);
@@ -198,6 +201,7 @@ int main(int argc, char *argv[])
    bool DoFit              = CL.GetBool("DoFit",         true);
    bool DoFoldNormalize    = CL.GetBool("FoldNormalize", false);
    bool DoToyError         = CL.GetBool("DoToyError",    false);
+   //cout<<"ROoT; rootIssue"<<endl;
    
    RooUnfold::ErrorTreatment ErrorChoice = RooUnfold::kErrors;
    if(DoToyError == true)
@@ -205,6 +209,7 @@ int main(int argc, char *argv[])
 
    TFile InputFile(InputFileName.c_str());
 
+   TH1D *HMatched = (TH1D *)InputFile.Get(ResponseMatched.c_str());
    TH1D *HMeasured = (TH1D *)InputFile.Get(ResponseMeasured.c_str());
    TH1D *HTruth    = (TH1D *)InputFile.Get(ResponseTruth.c_str());
    TH2D *HResponse = (TH2D *)InputFile.Get(ResponseName.c_str());
@@ -212,6 +217,10 @@ int main(int argc, char *argv[])
 
    TH1D *HInput    = (TH1D *)InputFile.Get(DataName.c_str())->Clone();
 
+   if(CL.GetBool("DoFakeRate",    false))
+      GetfakeRate(HInput,HMatched,HMeasured);
+  
+   
    int NGen = HTruth->GetNbinsX();
    int NReco = HInput->GetNbinsX();
 
@@ -221,6 +230,9 @@ int main(int argc, char *argv[])
    RemoveOutOfRange(HRawResponse);
    RemoveOutOfRange(HInput);
 
+
+
+   
    TH1D *HPrior = nullptr;
    if(PriorChoice == "MC")
       HPrior = ConstructPriorCopy(HTruth);
@@ -325,82 +337,82 @@ int main(int argc, char *argv[])
       }
    }
 
-   if(DoTUnfold == true)
-   {
-      TUnfoldDensity Unfold((TH2 *)HRawResponse,
-         TUnfold::kHistMapOutputVert,
-         TUnfold::kRegModeCurvature,    // Size, Curvature, Derivative
-         TUnfold::kEConstraintNone,     // None, Area
-         TUnfoldDensity::kDensityModeBinWidth);
-      // TUnfoldDensity Unfold((TH2 *)HRawResponse,
-      //    TUnfold::kHistMapOutputVert,
-      //    TUnfold::kRegModeCurvature,    // Size, Curvature, Derivative
-      //    TUnfold::kEConstraintNone,     // None, Area
-      //    TUnfoldDensity::kDensityModeBinWidth,
-      //    nullptr, nullptr, nullptr, "*[uUoO]");
-      // TUnfold Unfold((TH2 *)HResponse,
-      //    TUnfold::kHistMapOutputVert,
-      //    TUnfold::kRegModeCurvature,
-      //    TUnfold::kEConstraintArea);
-      Unfold.SetInput(HInput);
-      Unfold.SetBias(HPrior);
+   // if(DoTUnfold == true)
+   // {
+   //    TUnfoldDensity Unfold((TH2 *)HRawResponse,
+   //       TUnfold::kHistMapOutputVert,
+   //       TUnfold::kRegModeCurvature,    // Size, Curvature, Derivative
+   //       TUnfold::kEConstraintNone,     // None, Area
+   //       TUnfoldDensity::kDensityModeBinWidth);
+   //    // TUnfoldDensity Unfold((TH2 *)HRawResponse,
+   //    //    TUnfold::kHistMapOutputVert,
+   //    //    TUnfold::kRegModeCurvature,    // Size, Curvature, Derivative
+   //    //    TUnfold::kEConstraintNone,     // None, Area
+   //    //    TUnfoldDensity::kDensityModeBinWidth,
+   //    //    nullptr, nullptr, nullptr, "*[uUoO]");
+   //    // TUnfold Unfold((TH2 *)HResponse,
+   //    //    TUnfold::kHistMapOutputVert,
+   //    //    TUnfold::kRegModeCurvature,
+   //    //    TUnfold::kEConstraintArea);
+   //    Unfold.SetInput(HInput);
+   //    Unfold.SetBias(HPrior);
 
-      TSpline *LogTauX = nullptr, *LogTauY = nullptr, *LogTauCurvature = nullptr, *RhoLogTau = nullptr;
-      TGraph *LCurve;
-      int IBest = Unfold.ScanLcurve(1000, 1e-10, 1e0, &LCurve, &LogTauX, &LogTauY, &LogTauCurvature);
-      // int IBest = Unfold.ScanTau(1000, 0, 0, &RhoLogTau, TUnfoldDensity::kEScanTauRhoMax,
-      //    nullptr, nullptr, &LCurve, &LogTauX, &LogTauY);
+   //    TSpline *LogTauX = nullptr, *LogTauY = nullptr, *LogTauCurvature = nullptr, *RhoLogTau = nullptr;
+   //    TGraph *LCurve;
+   //    int IBest = Unfold.ScanLcurve(1000, 1e-10, 1e0, &LCurve, &LogTauX, &LogTauY, &LogTauCurvature);
+   //    // int IBest = Unfold.ScanTau(1000, 0, 0, &RhoLogTau, TUnfoldDensity::kEScanTauRhoMax,
+   //    //    nullptr, nullptr, &LCurve, &LogTauX, &LogTauY);
 
-      TH1 *H = Unfold.GetOutput("HUnfoldedTUnfold");
-      TH2 *HError = Unfold.GetEmatrixInput("HUnfoldedTUnfold");
-      HUnfolded.push_back(H);
+   //    TH1 *H = Unfold.GetOutput("HUnfoldedTUnfold");
+   //    TH2 *HError = Unfold.GetEmatrixInput("HUnfoldedTUnfold");
+   //    HUnfolded.push_back(H);
 
-      int ErrorNX = HError->GetNbinsX();
-      int ErrorNY = HError->GetNbinsY();
-      TMatrixD TUnfoldCovariance(ErrorNX, ErrorNY);
-      for(int iX = 0; iX < ErrorNX; iX++)
-         for(int iY = 0; iY < ErrorNY; iY++)
-            TUnfoldCovariance[iX][iY] = HError->GetBinContent(iX + 1, iY + 1);
-      Covariance.insert({"MUnfoldedTUnfold", TUnfoldCovariance});
+   //    int ErrorNX = HError->GetNbinsX();
+   //    int ErrorNY = HError->GetNbinsY();
+   //    TMatrixD TUnfoldCovariance(ErrorNX, ErrorNY);
+   //    for(int iX = 0; iX < ErrorNX; iX++)
+   //       for(int iY = 0; iY < ErrorNY; iY++)
+   //          TUnfoldCovariance[iX][iY] = HError->GetBinContent(iX + 1, iY + 1);
+   //    Covariance.insert({"MUnfoldedTUnfold", TUnfoldCovariance});
 
-      LCurve->SetName("GTUnfoldLCurve");
-      Graphs.push_back(LCurve);
+   //    LCurve->SetName("GTUnfoldLCurve");
+   //    Graphs.push_back(LCurve);
 
-      if(LogTauX != nullptr)
-      {
-         LogTauX->SetName("STUnfoldTauX");
-         Splines.push_back(LogTauX);
-      }
-      if(LogTauY != nullptr)
-      {
-         LogTauY->SetName("STUnfoldTauY");
-         Splines.push_back(LogTauY);
-      }
-      if(LogTauCurvature != nullptr)
-      {
-         LogTauCurvature->SetName("STUnfoldTauCurvature");
-         Splines.push_back(LogTauCurvature);
-      }
-      if(RhoLogTau != nullptr)
-      {
-         RhoLogTau->SetName("STUnfoldTauCurvature");
-         Splines.push_back(RhoLogTau);
-      }
+   //    if(LogTauX != nullptr)
+   //    {
+   //       LogTauX->SetName("STUnfoldTauX");
+   //       Splines.push_back(LogTauX);
+   //    }
+   //    if(LogTauY != nullptr)
+   //    {
+   //       LogTauY->SetName("STUnfoldTauY");
+   //       Splines.push_back(LogTauY);
+   //    }
+   //    if(LogTauCurvature != nullptr)
+   //    {
+   //       LogTauCurvature->SetName("STUnfoldTauCurvature");
+   //       Splines.push_back(LogTauCurvature);
+   //    }
+   //    if(RhoLogTau != nullptr)
+   //    {
+   //       RhoLogTau->SetName("STUnfoldTauCurvature");
+   //       Splines.push_back(RhoLogTau);
+   //    }
 
-      double X, Y, T;
-      LogTauX->GetKnot(IBest, T, X);
-      LogTauY->GetKnot(IBest, T, Y);
-      TGraph *GXY = new TGraph;
-      GXY->SetName("GTUnfoldXY");
-      GXY->SetPoint(0, X, Y);
-      Graphs.push_back(GXY);
+   //    double X, Y, T;
+   //    LogTauX->GetKnot(IBest, T, X);
+   //    LogTauY->GetKnot(IBest, T, Y);
+   //    TGraph *GXY = new TGraph;
+   //    GXY->SetName("GTUnfoldXY");
+   //    GXY->SetPoint(0, X, Y);
+   //    Graphs.push_back(GXY);
 
-      // cout << X << " " << Y << " " << T << endl;
+   //    // cout << X << " " << Y << " " << T << endl;
          
-      TH1D *HFold = ForwardFold(H, HResponse);
-      HFold->SetName("HRefoldedTUnfold");
-      HRefolded.push_back(HFold);
-   }
+   //    TH1D *HFold = ForwardFold(H, HResponse);
+   //    HFold->SetName("HRefoldedTUnfold");
+   //    HRefolded.push_back(HFold);
+   // }
 
    if(DoFit == true)
    {
@@ -506,6 +518,22 @@ vector<double> DetectBins(TH1D *HMin, TH1D *HMax)
    Result.erase(iterator2, Result.end());
 
    return Result;
+}
+
+void GetfakeRate(TH1D *HInput,TH1D *HMeasured,TH1D *HMatched)
+{
+  
+  //vector<double> fakeRate;
+
+    if(HMeasured == nullptr || HMatched == nullptr)
+      return;//vector<double>{};  // return empty vector
+
+    // Check bin consistency
+    if(HMeasured->GetNbinsX() != HMatched->GetNbinsX())
+      return; //vector<double>{};
+    HInput->Multiply(HMatched);
+    HInput->Divide(HMeasured);
+
 }
 
 void RemoveOutOfRange(TH1D *H)
