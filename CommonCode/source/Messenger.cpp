@@ -794,7 +794,19 @@ void TriggerTreeMessenger::FillTriggerNames()
    Name.push_back("HLT_HIPuAK4CaloJet60_Eta5p1_v1");
    Name.push_back("HLT_HIPuAK4CaloJet60_Eta5p1_v1");
    Name.push_back("HLT_HIPuAK4CaloJet40_Eta5p1_v1");
+   Name.push_back("HLT_HIPuAK4CaloJet40Eta5p1_MinBiasHF1AND_v6");
+   Name.push_back("HLT_HIPuAK4CaloJet60Eta5p1_MinBiasHF1AND_v6");
+   Name.push_back("HLT_HIPuAK4CaloJet40Eta5p1_MinBiasHF1AND_ZDC1nOR_v4");
+   Name.push_back("HLT_HIPuAK4CaloJet60Eta5p1_MinBiasHF1AND_ZDC1nOR_v4");
+   Name.push_back("HLT_HIPuAK4CaloJet40Eta5p1_MinBiasHF1AND_ZDC2nOR_v6");
+   Name.push_back("HLT_HIPuAK4CaloJet60Eta5p1_MinBiasHF1AND_ZDC2nOR_v6");
+   Name.push_back("HLT_HIPuAK4CaloJet80Eta5p1_v14");
+   Name.push_back("HLT_HIPuAK4CaloJet100Eta5p1_v14");
+   Name.push_back("HLT_HIPuAK4CaloJet120Eta2p1_v7");
+   Name.push_back("HLT_HIPuAK4CaloJet120Eta2p1_v14");
+   
 
+   
    Name.push_back("HLT_PAAK4PFJet40_Eta5p1v2");
    Name.push_back("HLT_PAAK4PFJet60_Eta5p1_v2");
    Name.push_back("HLT_PAAK4PFJet80_Eta5p1_v2");
@@ -972,6 +984,12 @@ void TriggerTreeMessenger::FillTriggerNames()
    Name.push_back("HLT_AK4PFJet80_v15");
    Name.push_back("HLT_AK4PFJet100_v15");
    Name.push_back("HLT_AK4PFJet120_v14");
+
+   Name.push_back("HLT_AK4PFJet40_v8");
+   Name.push_back("HLT_AK4PFJet60_v8");
+   Name.push_back("HLT_AK4PFJet80_v8");
+   Name.push_back("HLT_AK4PFJet100_v8");
+   Name.push_back("HLT_AK4PFJet120_v8");
 
    Name.push_back("HLT_AK4CaloJet30_v10");
    Name.push_back("HLT_AK4CaloJet40_v9");
