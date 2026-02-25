@@ -13,12 +13,12 @@ using namespace std;
 
 #include "CommandLine.h"
 #include "DataHelper.h"
-#include "Code/TauHelperFunctions3.h"
-#include "Code/DrawRandom.h"
+#include "TauHelperFunctions3.h"
+#include "DrawRandom.h"
 #include "PlotHelper4.h"
 #include "SetStyle.h"
 #include "CustomAssert.h"
-#include "RootUtilities.h"
+//#include "RootUtilities.h"
 
 #include "BinHelper.h"
 #include "Messenger.h"
@@ -34,7 +34,7 @@ vector<double> DoSampling(PdfFileHelper &PdfFile, int NSample,
 
 int main(int argc, char *argv[])
 {
-   SilenceRoot();
+  //SilenceRoot();
 
    SetThesisStyle();
 

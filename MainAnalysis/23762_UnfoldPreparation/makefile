@@ -1,19 +1,25 @@
 
-MCFraction = 1.0
-DataFraction = 1.0
+#MCFraction = 1.0
+#DataFraction = 1.0
 
 default: RunAA
 
 Prepare:
-	ln -sf ../23752_CopyJetFromForest/Output Input
-	ln -sf ../GlobalSetting/GlobalSetting.dh
+	#ln -sf ../23752_CopyJetFromForest/Output Input
+	ln -sf ../23752_CopyJetFromForest/ Input
+	ln -sf $(ProjectBase)/MainAnalysis/GlobalSetting/GlobalSetting.dh .
+	#ln -sf ../GlobalSetting/GlobalSetting.dh
 
 Execute: PrepareUnfold.cpp
-	CompileRootMacro PrepareUnfold.cpp Execute \
-		-I../../CommonCode/include
+	 g++ PrepareUnfold.cpp -o Execute `root-config --libs --cflags` \
+	-I$(ProjectBase)/CommonCode/include \
+	$(ProjectBase)/CommonCode/library/*.o 
 
 ExecutePreset: RunPreset.cpp
-	CompileRootMacro RunPreset.cpp ExecutePreset -I$(ProjectBase)/CommonCode/include/
+	g++ RunPreset.cpp -o ExecutePreset `root-config --libs --cflags` \
+	-I$(ProjectBase)/CommonCode/include \
+	$(ProjectBase)/CommonCode/library/*.o 
+
 
 Debug:
 	GenBins=`DHQuery GlobalSetting.dh Binning GenPT`; \
@@ -22,22 +28,8 @@ Debug:
 	DHQuery GlobalSetting.dh Binning GenPT
 
 RunAA: Execute ExecutePreset
-	eval `./ExecutePreset --MCTag Input/PbPbMCRho --DataTag Input/PbPbMCRho \
-		--Prefix PbPbMCRho --Suffix Nominal --GlobalSetting GlobalSetting.dh \
-		--Shift 0.0 --Smear 0.0 --Flooring false --MCFraction $(MCFraction) --DataFraction $(MCFraction) \
-		| grep ^time`
-	eval `./ExecutePreset --MCTag Input/PbPbMCRho --DataTag Input/PbPbData \
-		--Prefix PbPbData --Suffix Nominal --GlobalSetting GlobalSetting.dh \
-		--Shift 0.0 --Smear 0.0 --Flooring false --MCFraction $(MCFraction) --DataFraction $(DataFraction) \
-		| grep ^time`
-	eval `./ExecutePreset --MCTag Input/PbPbMCRho --DataTag Input/PbPbData \
-		--Prefix PbPbData --Suffix JECUp --GlobalSetting GlobalSetting.dh \
-		--Shift 1.0 --Smear 0.0 --Flooring false --MCFraction $(MCFraction) --DataFraction $(DataFraction) \
-		| grep ^time`
-	eval `./ExecutePreset --MCTag Input/PbPbMCRho --DataTag Input/PbPbData \
-		--Prefix PbPbData --Suffix JECDown --GlobalSetting GlobalSetting.dh \
-		--Shift -1.0 --Smear 0.0 --Flooring false --MCFraction $(MCFraction) --DataFraction $(DataFraction) \
-		| grep ^time`
+	#bash RunFileAA_MC.sh
+	bash RunFileAA_Data_Sys.sh
 
 RunAAMCCentrality: Execute ExecutePreset
 	eval `./ExecutePreset --MCTag Input/PbPbMC --DataTag Input/PbPbMC \
@@ -76,24 +68,13 @@ RunAAExternal: Execute ExecutePreset
 		--Prefix PbPbData --Suffix JECDown --GenBins $$GenBins --RecoBins $$RecoBins \
 		--Shift -1.0 --Smear 0.0 --Flooring false --MCFraction $(MCFraction) --DataFraction $(DataFraction) \
 		| grep ^time`;
-	
+
 RunPP: Execute ExecutePreset
-	# eval `./ExecutePreset --MCTag Input/PPMC --DataTag Input/PPMC \
-	# 	--Prefix PPMC --Suffix Nominal --Centrality "Inclusive" --GlobalSetting GlobalSetting.dh \
-	# 	--Shift 0.0 --Smear 0.0 --Flooring false --MCFraction $(MCFraction) --DataFraction $(MCFraction) \
-	# 	| grep ^time`
-	eval `./ExecutePreset --MCTag Input/PPMC --DataTag Input/PPData \
-		--Prefix PPData --Suffix Nominal --Centrality "Inclusive" --GlobalSetting GlobalSetting.dh \
-		--Shift 0.0 --Smear 0.0 --Flooring false --MCFraction $(MCFraction) --DataFraction $(DataFraction) \
-		| grep ^time`
-	eval `./ExecutePreset --MCTag Input/PPMC --DataTag Input/PPData \
-		--Prefix PPData --Suffix JECUp --Centrality "Inclusive" --GlobalSetting GlobalSetting.dh \
-		--Shift 1.0 --Smear 0.0 --Flooring false --MCFraction $(MCFraction) --DataFraction $(DataFraction) \
-		| grep ^time`
-	eval `./ExecutePreset --MCTag Input/PPMC --DataTag Input/PPData \
-		--Prefix PPData --Suffix JECDown --Centrality "Inclusive" --GlobalSetting GlobalSetting.dh  \
-		--Shift -1.0 --Smear 0.0 --Flooring false --MCFraction $(MCFraction) --DataFraction $(DataFraction) \
-		| grep ^time`
+	bash RunFilePP_MC.sh
+	bash RunFilePP_Data_Sys.sh
+
+
+
 
 DebugRun: Execute ExecutePreset
 	# eval `./ExecutePreset --MCTag Input/PPMC --DataTag Input/PPMC \

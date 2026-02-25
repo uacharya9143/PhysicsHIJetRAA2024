@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DHSet GlobalSetting.dh "Global" "JetR" string "1 2 3 4 5 6 7 8 9"
-DHSet GlobalSetting.dh "Global" "Centrality" string "0to10 10to30 30to50 50to90 50to70 70to90"
+DHSet GlobalSetting.dh "Global" "Centrality" string "Inclusive 0to10 10to30 30to50 50to90 50to70 70to90"
 DHSet GlobalSetting.dh "JetR" "1" float 0.15
 DHSet GlobalSetting.dh "JetR" "2" float 0.20
 DHSet GlobalSetting.dh "JetR" "3" float 0.30

@@ -1,14 +1,22 @@
 #!/bin/bash
 
-JetR=`DHQuery GlobalSetting.dh Global JetR | tr -d '"'`
+#JetR=`DHQuery GlobalSetting.dh Global JetR | tr -d '"'`
+JetR="1 2 3 4 6 7 8 9"; \
 Centrality=`DHQuery GlobalSetting.dh Global Centrality | tr -d '"'`
 
-PPVariations="HJECUp,HJECDown,HJECAggressiveUp,HJECAggressiveDown,HJERUp,HJERDown,HIteration,HPrior,HEarthquake,HBinBiasUp,HBinBiasDown"
-PPSystematicGroups="1,1,1,1,2,2,3,3,4,4,4"
-PPLabels="JES,JER,Unfolding,Matrix"
-AAVariations="HJECUp,HJECDown,HJECAggressiveUp,HJECAggressiveDown,HJERUp,HJERDown,HIteration,HPrior,HCentralityUp,HCentralityDown,HJECQuench,HEarthquake,HBinBiasUp,HBinBiasDown"
-AASystematicGroups="1,1,1,1,2,2,3,3,5,5,4,6,6,6"
-AALabels="JES,JER,Unfolding,Quench,Centrality,Matrix"
+#PPVariations="HJECUp,HJECDown,HJECAggressiveUp,HJECAggressiveDown,HJERUp,HJERDown,HIteration,HPrior,HEarthquake,HBinBiasUp,HBinBiasDown"
+#PPSystematicGroups="1,1,1,1,2,2,3,3,4,4,4"
+#PPLabels="JES,JER,Unfolding,Matrix"
+#AAVariations="HJECUp,HJECDown,HJECAggressiveUp,HJECAggressiveDown,HJERUp,HJERDown,HIteration,HPrior,HCentralityUp,HCentralityDown,HJECQuench,HEarthquake,HBinBiasUp,HBinBiasDown"
+#AASystematicGroups="1,1,1,1,2,2,3,3,5,5,4,6,6,6"
+#AALabels="JES,JER,Unfolding,Quench,Centrality,Matrix"
+
+PPVariations="HJECUp,HJECDown,HJERUp,HJERDown,HIteration"
+PPSystematicGroups="1,1,2,2,3"
+PPLabels="JES,JER,Unfolding"
+AAVariations="HJECUp,HJECDown,HJERUp,HJERDown,HIteration"
+AASystematicGroups="1,1,2,2,3"
+AALabels="JES,JER,Unfolding"
 
 # Run pp spectrum
 echo Running pp spectrum plots
@@ -22,7 +30,9 @@ do
       --FinalOutput FinalPlots/PPData_R${R}_CentralityInclusive.pdf \
       --Global Systematics.dh \
       --GenPrimaryMin 0 --GenPrimaryMax 1600 \
-      --WorldXMin $LowerBound --WorldXMax 1500 --WorldYMin 0 --WorldYMax 1.0 --LogY false --LogX true \
+      --WorldXMin $LowerBound \
+      --WorldXMax 1000 --WorldYMin 0 --WorldYMax 1.0 \
+      --LogY false --LogX true \
       --XLabel "Jet p_{T}" --YLabel "Uncertainty" --Binning "none" \
       --LegendX 0.12 --LegendY 0.5 --LegendSize 0.05 \
       --XAxis 305 --YAxis 505 --RAxis 303 --MarkerModifier 1 \
@@ -32,6 +42,7 @@ do
       --SystematicGroups ${PPSystematicGroups} \
       --Labels ${PPLabels}
 done
+#        --WorldXMin $LowerBound \
 
 # Run PbPb spectrum
 echo Running PbPb spectrum plots
@@ -41,8 +52,11 @@ do
    do
       RValue=`DHQuery GlobalSetting.dh JetR $R`
       LowerBound=`DHQuery GlobalSetting.dh TriggerTurnOn R${R}_Centrality${C}_Cut`
-      CMin=`DHQuery GlobalSetting.dh CentralityMin $C | MultiplyConst 100`
-      CMax=`DHQuery GlobalSetting.dh CentralityMax $C | MultiplyConst 100`
+      #CMax=`DHQuery GlobalSetting.dh CentralityMax $C | MultiplyConst 100`
+
+      #CMax=`DHQuery GlobalSetting.dh CentralityMax $C | MultiplyConst 100`
+      CMin=$(echo "$(DHQuery GlobalSetting.dh CentralityMin ${C} | tr -d '"')" \* 100 | bc)
+      CMax=$(echo "$(DHQuery GlobalSetting.dh CentralityMax ${C} | tr -d '"')" \* 100 | bc)
       CLabel="${CMin}-${CMax}%"
       
       ./Execute --Input Systematics/PbPbData_R${R}_Centrality${C}.root \
@@ -50,7 +64,9 @@ do
          --FinalOutput FinalPlots/PbPbData_R${R}_Centrality${C}.pdf \
          --Global Systematics.dh \
          --GenPrimaryMin 0 --GenPrimaryMax 1600 \
-         --WorldXMin $LowerBound --WorldXMax 1500 --WorldYMin 0 --WorldYMax 1.0 --LogY false --LogX true \
+         --WorldXMin $LowerBound \
+	      --WorldXMax 1000 --WorldYMin 0 --WorldYMax 1.0 \
+	      --LogY false --LogX true \
          --XLabel "Jet p_{T}" --YLabel "Uncertainty" --Binning "none" \
          --LegendX 0.12 --LegendY 0.5 --LegendSize 0.05 \
          --XAxis 305 --YAxis 505 --RAxis 303 --MarkerModifier 1 \
@@ -74,7 +90,9 @@ do
       --FinalOutput FinalPlots/PPDataRatio_R${R}R9_CentralityInclusive.pdf \
       --Global Systematics.dh \
       --GenPrimaryMin 0 --GenPrimaryMax 1600 \
-      --WorldXMin $LowerBound --WorldXMax 1500 --WorldYMin 0 --WorldYMax 1.0 --LogY false --LogX true \
+      --WorldXMin $LowerBound \
+      --WorldXMax 1000 --WorldYMin 0 --WorldYMax 1.0 \
+      --LogY false --LogX true \
       --XLabel "Jet p_{T}" --YLabel "Uncertainty" --Binning "none" \
       --LegendX 0.12 --LegendY 0.5 --LegendSize 0.05 \
       --XAxis 305 --YAxis 505 --RAxis 303 --MarkerModifier 1 \
@@ -93,8 +111,12 @@ do
    do
       RValue=`DHQuery GlobalSetting.dh JetR $R`
       LowerBound=`DHQuery GlobalSetting.dh TriggerTurnOn R${R}_Centrality${C}_Cut`
-      CMin=`DHQuery GlobalSetting.dh CentralityMin $C | MultiplyConst 100`
-      CMax=`DHQuery GlobalSetting.dh CentralityMax $C | MultiplyConst 100`
+      #CMax=`DHQuery GlobalSetting.dh CentralityMax $C | MultiplyConst 100`
+
+      #CMax=`DHQuery GlobalSetting.dh CentralityMax $C | MultiplyConst 100`
+      
+      CMin=$(echo "$(DHQuery GlobalSetting.dh CentralityMin ${C} | tr -d '"')" \* 100 | bc)
+      CMax=$(echo "$(DHQuery GlobalSetting.dh CentralityMax ${C} | tr -d '"')" \* 100 | bc)
       CLabel="${CMin}-${CMax}%"
    
       ./Execute --Input CombinedSystematics/RAA_R${R}_Centrality${C}.root \
@@ -102,7 +124,9 @@ do
          --FinalOutput FinalPlots/RAA_R${R}_Centrality${C}.pdf \
          --Global Systematics.dh \
          --GenPrimaryMin 0 --GenPrimaryMax 1600 \
-         --WorldXMin $LowerBound --WorldXMax 1500 --WorldYMin 0 --WorldYMax 1.0 --LogY false --LogX true \
+         --WorldXMin $LowerBound \
+	 --WorldXMax 1000 --WorldYMin 0 --WorldYMax 1.0 \
+	 --LogY false --LogX true \
          --XLabel "Jet p_{T}" --YLabel "Uncertainty" --Binning "none" \
          --LegendX 0.12 --LegendY 0.5 --LegendSize 0.05 \
          --XAxis 305 --YAxis 505 --RAxis 303 --MarkerModifier 1 \
@@ -122,8 +146,11 @@ do
    do
       RValue=`DHQuery GlobalSetting.dh JetR $R`
       LowerBound=`DHQuery GlobalSetting.dh TriggerTurnOn R${R}_Centrality${C}_Cut`
-      CMin=`DHQuery GlobalSetting.dh CentralityMin $C | MultiplyConst 100`
-      CMax=`DHQuery GlobalSetting.dh CentralityMax $C | MultiplyConst 100`
+      #CMax=`DHQuery GlobalSetting.dh CentralityMax $C | MultiplyConst 100`
+
+      #CMax=`DHQuery GlobalSetting.dh CentralityMax $C | MultiplyConst 100`
+      CMin=$(echo "$(DHQuery GlobalSetting.dh CentralityMin ${C} | tr -d '"')" \* 100 | bc)
+      CMax=$(echo "$(DHQuery GlobalSetting.dh CentralityMax ${C} | tr -d '"')" \* 100 | bc)
       CLabel="${CMin}-${CMax}%"
    
       ./Execute --Input CombinedSystematics/RCP_R${R}_Centrality${C}.root \
@@ -131,7 +158,9 @@ do
          --FinalOutput FinalPlots/RCP_R${R}_Centrality${C}.pdf \
          --Global Systematics.dh \
          --GenPrimaryMin 0 --GenPrimaryMax 1600 \
-         --WorldXMin $LowerBound --WorldXMax 1500 --WorldYMin 0 --WorldYMax 1.0 --LogY false --LogX true \
+         --WorldXMin $LowerBound \
+	 --WorldXMax 1000 --WorldYMin 0 --WorldYMax 1.0 \
+	 --LogY false --LogX true \
          --XLabel "Jet p_{T}" --YLabel "Uncertainty" --Binning "none" \
          --LegendX 0.12 --LegendY 0.5 --LegendSize 0.05 \
          --XAxis 305 --YAxis 505 --RAxis 303 --MarkerModifier 1 \
@@ -151,8 +180,11 @@ do
    do
       RValue=`DHQuery GlobalSetting.dh JetR $R`
       LowerBound=`DHQuery GlobalSetting.dh TriggerTurnOn R${R}_Centrality${C}_Cut`
-      CMin=`DHQuery GlobalSetting.dh CentralityMin $C | MultiplyConst 100`
-      CMax=`DHQuery GlobalSetting.dh CentralityMax $C | MultiplyConst 100`
+      #CMax=`DHQuery GlobalSetting.dh CentralityMax $C | MultiplyConst 100`
+
+      #CMax=`DHQuery GlobalSetting.dh CentralityMax $C | MultiplyConst 100`
+      CMin=$(echo "$(DHQuery GlobalSetting.dh CentralityMin ${C} | tr -d '"')" \* 100 | bc)
+      CMax=$(echo "$(DHQuery GlobalSetting.dh CentralityMax ${C} | tr -d '"')" \* 100 | bc)
       CLabel="${CMin}-${CMax}%"
       
       ./Execute --Input CombinedSystematics/RRAA_R${R}R1_Centrality${C}.root \
@@ -160,7 +192,9 @@ do
          --FinalOutput FinalPlots/RRAA_R${R}R1_Centrality${C}.pdf \
          --Global Systematics.dh \
          --GenPrimaryMin 0 --GenPrimaryMax 1600 \
-         --WorldXMin $LowerBound --WorldXMax 1500 --WorldYMin 0 --WorldYMax 1.0 --LogY false --LogX true \
+         --WorldXMin $LowerBound \
+	 --WorldXMax 1000 --WorldYMin 0 --WorldYMax 1.0 \
+	 --LogY false --LogX true \
          --XLabel "Jet p_{T}" --YLabel "Uncertainty" --Binning "none" \
          --LegendX 0.12 --LegendY 0.5 --LegendSize 0.05 \
          --XAxis 305 --YAxis 505 --RAxis 303 --MarkerModifier 1 \

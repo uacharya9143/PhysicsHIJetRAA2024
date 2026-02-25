@@ -23,7 +23,6 @@ using namespace std;
 #include "SetStyle.h"
 #include "CustomAssert.h"
 #include "DataHelper.h"
-#include "RootUtilities.h"
 
 int main(int argc, char *argv[]);
 vector<double> DetectBins(TH1D *HMin, TH1D *HMax);
@@ -42,8 +41,6 @@ vector<TGraphAsymmErrors> TranscribeMC(string FileName, string HistogramName,
 
 int main(int argc, char *argv[])
 {
-   SilenceRoot();
-
    SetThesisStyle();
    vector<int> Colors = GetPrimaryColors();
 
@@ -85,8 +82,6 @@ int main(int argc, char *argv[])
    double WorldXMax               = CL.GetDouble("WorldXMax", 50);
    double WorldYMin               = CL.GetDouble("WorldYMin", 1000);
    double WorldYMax               = CL.GetDouble("WorldYMax", 5e5);
-   double WorldRMin               = CL.GetDouble("WorldRMin", 0.51);
-   double WorldRMax               = CL.GetDouble("WorldRMax", 1.49);
    bool LogX                      = CL.GetBool("LogX", true);
    bool LogY                      = CL.GetBool("LogY", true);
 
@@ -96,7 +91,6 @@ int main(int argc, char *argv[])
 
    int XAxisSpacing               = CL.GetInt("XAxis", 505);
    int YAxisSpacing               = CL.GetInt("YAxis", 505);
-   int RAxisSpacing               = CL.GetInt("RAxis", 505);
 
    double LegendX                 = CL.GetDouble("LegendX", 0.5);
    double LegendY                 = CL.GetDouble("LegendY", 0.5);
@@ -187,54 +181,33 @@ int main(int argc, char *argv[])
 
    int PadWidth     = 250;
    int PadHeight    = 250;
-   int PadRHeight   = 100;
    int MarginLeft   = (50 + (Column - 1) * 15);
    int MarginRight  = (25 + (Column - 1) * 10);
    int MarginTop    = (25 + (Column - 1) * 10);
    int MarginBottom = (50 + (Column - 1) * 15);
 
    double CanvasWidth = MarginLeft + PadWidth * Column + MarginRight;
-   double CanvasHeight = MarginBottom + PadHeight * Row + PadRHeight * Row + MarginTop;
+   double CanvasHeight = MarginBottom + PadHeight * Row + MarginTop;
 
    double PadDX = PadWidth / CanvasWidth;
    double PadDY = PadHeight / CanvasHeight;
    double PadX0 = MarginLeft / CanvasWidth;
    double PadY0 = MarginBottom / CanvasHeight;
-   double PadDR = PadRHeight / CanvasHeight;
 
    vector<TGraphAsymmErrors> GResult
-      = Transcribe(H1[PrimaryName], Bins1, Bins2, nullptr, true, Underflow, Overflow);
-   vector<TGraphAsymmErrors> GSystematics
-      = Transcribe(H1["HSystematicsPlus"], Bins1, Bins2, H1["HSystematicsMinus"], true, Underflow, Overflow);
+     = Transcribe(H1[PrimaryName], Bins1, Bins2, nullptr, true, Underflow, Overflow);
    
+   vector<TGraphAsymmErrors> GSystematics
+     = Transcribe(H1["HSystematicsPlus"], Bins1, Bins2, H1["HSystematicsMinus"], true, Underflow, Overflow);
+
    double PrimaryScale = AddUp(H1[PrimaryName], WorldXMin, WorldXMax, Bins1);
+   
    vector<vector<TGraphAsymmErrors>> GMC(MCCount);
    for(int i = 0; i < MCCount; i++)
       GMC[i] = TranscribeMC(MCFileNames[i], MCHistNames[i],
          PrimaryMinOverwrite, PrimaryMaxOverwrite,
          WorldXMin, WorldXMax, Tier,
          DoSelfNormalize, (NormalizeMCToData[i] ? PrimaryScale : MCExtraScale[i]), MCAbsoluteScale[i]);
-   
-   // for(TGraphAsymmErrors G : GResult)
-   //    cout << "Total integral = " << CalculateIntegral(G, WorldXMin) << endl;
-
-   vector<TGraphAsymmErrors> GRResult, GRSystematics;
-   vector<vector<TGraphAsymmErrors>> GRMC(MCCount);
-   for(int i = 0; i < (int)GResult.size(); i++)
-   {
-      GRResult.push_back(CalculateRatio(GResult[i], GResult[i]));
-      GRSystematics.push_back(CalculateRatio(GSystematics[i], GResult[i]));
-      for(int j = 0; j < MCCount; j++)
-      {
-         if(GMC[j].size() > i)
-            GRMC[j].push_back(CalculateRatio(GMC[j][i], GResult[i]));
-         else
-         {
-            TGraphAsymmErrors Dummy;
-            GRMC[j].push_back(CalculateRatio(Dummy, GResult[i]));
-         }
-      }
-   }
 
    PdfFile.AddTextPage("Result");
    for(TGraphAsymmErrors G : GResult)
@@ -243,16 +216,11 @@ int main(int argc, char *argv[])
    PdfFile.AddTextPage("Systematics");
    for(TGraphAsymmErrors G : GSystematics)
       PdfFile.AddPlot(G, "ap");
-   
-   PdfFile.AddTextPage("Systematics ratio");
-   for(TGraphAsymmErrors G : GRSystematics)
-      PdfFile.AddPlot(G, "ap");
 
    TCanvas Canvas("Canvas", "", CanvasWidth, CanvasHeight);
 
    // Setup pads
    vector<TPad *> Pads;
-   vector<TPad *> RPads;
    for(int i = IgnoreGroup; i < BinningCount; i++)
    {
       int R = (i - IgnoreGroup) / Column;
@@ -260,16 +228,14 @@ int main(int argc, char *argv[])
 
       double XMin = PadX0 + PadDX * C;
       double XMax = PadX0 + PadDX * (C + 1);
-      double YMin = PadY0 + (PadDY + PadDR) * R;
-      double YMax = PadY0 + (PadDY + PadDR) * (R + 1);
+      double YMin = PadY0 + PadDY * R;
+      double YMax = PadY0 + PadDY * (R + 1);
 
-      Pads.emplace_back(new TPad(Form("P%d", i), "", XMin, YMin + PadDR, XMax, YMax));
-      RPads.emplace_back(new TPad(Form("RP%d", i), "", XMin, YMin, XMax, YMin + PadDR));
+      Pads.emplace_back(new TPad(Form("P%d", i), "", XMin, YMin, XMax, YMax));
 
       if(LogX == true)
       {
          Pads[i-IgnoreGroup]->SetLogx();
-         RPads[i-IgnoreGroup]->SetLogx();
       }
       if(LogY == true)
          Pads[i-IgnoreGroup]->SetLogy();
@@ -277,11 +243,9 @@ int main(int argc, char *argv[])
 
    for(TPad *P : Pads)
       SetPad(P);
-   for(TPad *P : RPads)
-      SetPad(P);
    
    // Setup axes
-   vector<TGaxis *> XAxis, YAxis, RAxis;
+   vector<TGaxis *> XAxis, YAxis;
    for(int i = 0; i < Column; i++)
    {
       string Option = (LogX ? "G" : "");
@@ -291,15 +255,12 @@ int main(int argc, char *argv[])
    }
    for(int i = 0; i < Row; i++)
    {
-      double YMin = PadY0 + (PadDY + PadDR) * i;
-      double YMax = YMin + PadDY + PadDR;
+      double YMin = PadY0 + PadDY * i;
+      double YMax = YMin + PadDY;
       string Option = (LogY ? "G" : "");
-      YAxis.emplace_back(new TGaxis(PadX0, YMin + PadDR, PadX0, YMax, WorldYMin, WorldYMax, YAxisSpacing, Option.c_str()));
-      RAxis.emplace_back(new TGaxis(PadX0, YMin, PadX0, YMin + PadDR, WorldRMin, WorldRMax, RAxisSpacing, ""));
+      YAxis.emplace_back(new TGaxis(PadX0, YMin, PadX0, YMax, WorldYMin, WorldYMax, YAxisSpacing, Option.c_str()));
       SetAxis(*YAxis[i]);
-      SetAxis(*RAxis[i]);
       YAxis[i]->SetLabelSize(0.030 - max(Row, Column) * 0.001);
-      RAxis[i]->SetLabelSize(0.030 - max(Row, Column) * 0.001);
    }
 
    // Setup axis labels
@@ -314,21 +275,18 @@ int main(int argc, char *argv[])
    Latex.SetTextAngle(90);
    Latex.SetTextAlign(22);
    for(int i = 0; i < Row; i++)
-      Latex.DrawLatex(PadX0 * 0.3, PadY0 + PadDR * (i + 1.0) + PadDY * (i + 0.5), YLabel.c_str());
-   for(int i = 0; i < Row; i++)
-      Latex.DrawLatex(PadX0 * 0.3, PadY0 + PadDR * (i + 0.5) + PadDY * i, "Ratio to Data");
+      Latex.DrawLatex(PadX0 * 0.3, PadY0 + PadDY * (i + 0.5), YLabel.c_str());
 
    // Setup general information
    Latex.SetTextAngle(0);
    Latex.SetTextAlign(11);
-   Latex.DrawLatex(PadX0, PadY0 + PadDR * Row + PadDY * Row + 0.01, "CMS #font[52]{Preliminary}");
+   Latex.DrawLatex(PadX0, PadY0 + PadDY * Row + 0.01, "CMS #font[52]{Preliminary}");
    Latex.SetTextAlign(31);
-   Latex.DrawLatex(PadX0 + PadDX * Column, PadY0 + PadDR * Row + PadDY * Row + 0.01,
-      Form("%s 5.02 TeV %.2f %s", System.c_str(), Luminosity, LuminosityUnit.c_str()));
+   Latex.DrawLatex(PadX0 + PadDX * Column, PadY0 + PadDY * Row + 0.01,
+      Form("%s 5.36 TeV %.2f %s", System.c_str(), Luminosity, LuminosityUnit.c_str()));
 
    // Setup worlds
    vector<TH2D *> HWorld;
-   vector<TH2D *> HWorldR;
    for(int i = IgnoreGroup; i < BinningCount; i++)
    {
       int Index = i - IgnoreGroup;
@@ -338,12 +296,6 @@ int main(int argc, char *argv[])
       SetWorld(HWorld[Index]);
       HWorld[Index]->GetXaxis()->SetNdivisions(XAxisSpacing);
       HWorld[Index]->GetYaxis()->SetNdivisions(YAxisSpacing);
-      
-      RPads[Index]->cd();
-      HWorldR.emplace_back(new TH2D(Form("HWorldR%d", i), "", 100, WorldXMin, WorldXMax, 100, WorldRMin, WorldRMax));
-      SetWorld(HWorldR[Index]);
-      HWorldR[Index]->GetXaxis()->SetNdivisions(XAxisSpacing);
-      HWorldR[Index]->GetYaxis()->SetNdivisions(RAxisSpacing);
    }
 
    // Adding panel labeling
@@ -375,9 +327,9 @@ int main(int argc, char *argv[])
    Legend.SetFillStyle(0);
    Legend.SetBorderSize(0);
    Legend.AddEntry(&GSystematics[BinningCount-1], DataLabel.c_str(), "plf");
-   for(int j = 0; j < MCCount; j++)
+   for(int j = 0; j < MCCount; j++)//Input As MCTruth
       if(GMC[j].size() > 0)
-         Legend.AddEntry(&GMC[j][BinningCount-1], MCLabels[j].c_str(), "l");
+         Legend.AddEntry(&GMC[j][BinningCount-1], MCLabels[j].c_str(), "l");//Input As MCTruth
 
    // Plot the actual curves & legend
    for(int i = IgnoreGroup; i < BinningCount; i++)
@@ -411,9 +363,9 @@ int main(int argc, char *argv[])
       GResult[i].SetMarkerColor(Colors[6]);
 
       GSystematics[i].Draw("2");
-      for(int j = 0; j < MCCount; j++)
+      for(int j = 0; j < MCCount; j++)//Input As MCTruth
          if(GMC[j].size() > i)
-            GMC[j][i].Draw("lz");
+            GMC[j][i].Draw("lz");//Input As MCTruth
       GResult[i].Draw("pz");
 
       HWorld[Index]->Draw("axis same");
@@ -437,36 +389,6 @@ int main(int argc, char *argv[])
 
       if(i == BinningCount - 1)
          Legend.Draw();
-
-      RPads[Index]->cd();
-
-      for(int j = 0; j < MCCount; j++)
-      {
-         GRMC[j][i].SetLineWidth(2);
-         GRMC[j][i].SetLineColor(Colors[MCColors[j]]);
-         GRMC[j][i].SetMarkerStyle(1);
-         GRMC[j][i].SetMarkerColor(Colors[MCColors[j]]);
-      }
-
-      GRSystematics[i].SetLineWidth(2);
-      GRSystematics[i].SetLineColor(Colors[6]);
-      GRSystematics[i].SetFillColor(Colors[2]);
-      GRSystematics[i].SetMarkerStyle(20);
-      GRSystematics[i].SetMarkerSize(0.5);
-      GRSystematics[i].SetMarkerColor(Colors[6]);
-      
-      GRResult[i].SetLineWidth(2);
-      GRResult[i].SetLineColor(Colors[6]);
-      GRResult[i].SetMarkerStyle(20);
-      GRResult[i].SetMarkerSize(0.5);
-      GRResult[i].SetMarkerColor(Colors[6]);
-
-      GRSystematics[i].Draw("2");
-      for(int j = 0; j < MCCount; j++)
-         GRMC[j][i].Draw("lz");
-      GRResult[i].Draw("pz");
-      
-      HWorldR[Index]->Draw("axis same");
    }
 
    Canvas.cd();
@@ -514,12 +436,9 @@ int main(int argc, char *argv[])
    }
 
    for(TH2D *H : HWorld)    delete H;
-   for(TH2D *H : HWorldR)   delete H;
    for(TGaxis *A : XAxis)   delete A;
    for(TGaxis *A : YAxis)   delete A;
-   for(TGaxis *A : RAxis)   delete A;
    for(TPad *P : Pads)      delete P;
-   for(TPad *P : RPads)     delete P;
 
    SystematicFile.Close();
    InputFile.Close();
@@ -529,6 +448,8 @@ int main(int argc, char *argv[])
 
    return 0;
 }
+
+// ... [All other functions remain exactly the same as in your original code]
 
 vector<double> DetectBins(TH1D *HMin, TH1D *HMax)
 {
@@ -604,8 +525,6 @@ TH1D *BuildSystematics(TH1D *HResult, TH1D *HVariation)
       double V = HResult->GetBinContent(i);
       double R = HVariation->GetBinContent(i);
       HSystematics->SetBinContent(i, V * (R + 1));
-
-      // cout << i << " " << V << " " << R << endl;
    }
 
    return HSystematics;
@@ -636,7 +555,7 @@ vector<TGraphAsymmErrors> Transcribe(TH1D *H, vector<double> Bins1, vector<doubl
 
    for(int iB = 0; iB < BinningCount; iB++)
    {
-      for(int i = Underflow; i < PrimaryBinCount - Overflow; i++)
+      for(int i = 0; i < PrimaryBinCount ; i++)
       {
          double X = (PrimaryBins[i] + PrimaryBins[i+1]) / 2;
          double DX = (PrimaryBins[i+1] - PrimaryBins[i]) / 2;
@@ -651,8 +570,6 @@ vector<TGraphAsymmErrors> Transcribe(TH1D *H, vector<double> Bins1, vector<doubl
          {
             double YUp = H->GetBinContent(i + iB * PrimaryBinCount + 1);
             double YDown = H2->GetBinContent(i + iB * PrimaryBinCount + 1);
-
-            // cout << iB << " " << i << " " << YUp << " " << YDown << endl;
 
             Y = (YUp + YDown) / 2;
             DY = fabs(YUp - YDown) / 2;
@@ -690,7 +607,6 @@ void SetAxis(TGaxis &A)
    A.SetLabelSize(0.030);
    A.SetMaxDigits(6);
    A.SetMoreLogLabels();
-   // A.SetNoExponent();
    A.Draw();
 }
 
@@ -708,8 +624,6 @@ TGraphAsymmErrors CalculateRatio(TGraphAsymmErrors &G1, TGraphAsymmErrors &G2)
    
    if(G1.GetN() != G2.GetN())
       return G;
-
-   // cout << G1.GetN() << " " << G2.GetN() << endl;
 
    int N1 = G1.GetN();
    int N2 = G2.GetN();
@@ -914,4 +828,3 @@ vector<TGraphAsymmErrors> TranscribeMC(string FileName, string HistogramName,
 
    return G;
 }
-

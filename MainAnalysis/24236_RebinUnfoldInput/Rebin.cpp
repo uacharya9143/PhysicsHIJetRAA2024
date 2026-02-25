@@ -9,7 +9,7 @@ using namespace std;
 #include "CommandLine.h"
 #include "DataHelper.h"
 #include "CustomAssert.h"
-#include "Code/DrawRandom.h"
+#include "DrawRandom.h"
 
 #include "BinHelper.h"
 

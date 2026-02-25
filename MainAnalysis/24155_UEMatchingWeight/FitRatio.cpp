@@ -120,17 +120,36 @@ int main(int argc, char *argv[])
    DHFile.SaveToFile();
 
    TCanvas Canvas;
-   
+   gStyle->SetOptFit(0);  // turn off stat box
+
    GRatioLog->Draw("ap");
-   FLog.Draw("same");
+   GRatioLog->GetXaxis()->SetTitle("#frac{#Sigma W_{i}*UE}{#Sigma W_{i}}");
+   GRatioLog->GetXaxis()->SetTitleSize(0.025);
+   GRatioLog->GetXaxis()->SetTitleOffset(1.15);
+   GRatioLog->GetYaxis()->SetTitle("#frac{(#Sigma W_{i} / #Delta UE)_{Data}}{(#Sigma W_{i} / #Delta UE)_{MC}}");
+   GRatioLog->GetYaxis()->SetTitleSize(0.03);
+   GRatioLog->GetYaxis()->SetTitleOffset(1.10);
+   //FLog.Draw("same");
    Canvas.SetLogy(false);
    PdfFile.AddCanvas(Canvas);
    
+   GRatio->GetXaxis()->SetTitle("#frac{#Sigma W_{i}*UE}{#Sigma W_{i}}");
+   GRatio->GetYaxis()->SetTitle("#frac{(#Sigma W_{i} / #Delta UE)_{Data}}{(#Sigma W_{i} / #Delta UE)_{MC}}");
+   GRatio->GetXaxis()->SetTitleSize(0.025);
+   GRatio->GetXaxis()->SetTitleOffset(1.15);
+   GRatio->GetYaxis()->SetTitleSize(0.03);
+   GRatio->GetYaxis()->SetTitleOffset(1.10);
    GRatio->Draw("ap");
    F.Draw("same");
    Canvas.SetLogy(false);
    PdfFile.AddCanvas(Canvas);
    
+   GRatio->GetXaxis()->SetTitle("#frac{#Sigma W_{i}*UE}{#Sigma W_{i}}");
+   GRatio->GetYaxis()->SetTitle("#frac{(#Sigma W_{i} / #Delta UE)_{Data}}{(#Sigma W_{i} / #Delta UE)_{MC}}");
+   GRatio->GetXaxis()->SetTitleSize(0.025);
+   GRatio->GetXaxis()->SetTitleOffset(1.15);
+   GRatio->GetYaxis()->SetTitleSize(0.03);
+   GRatio->GetYaxis()->SetTitleOffset(1.10);
    GRatio->Draw("ap");
    F.Draw("same");
    Canvas.SetLogy(true);

@@ -4,8 +4,10 @@ default: Prepare
 Prepare:
 	mkdir -p Output
 	rm -f Input UnfoldedInput
-	ln -sf $(ProjectBase)/MainAnalysis/24236_RebinUnfoldInput//Output Input
-	ln -sf $(ProjectBase)/MainAnalysis/23762_ActualUnfold/Output UnfoldedInput
+	#ln -sf $(ProjectBase)/MainAnalysis/24236_RebinUnfoldInput//Output Input
+	#ln -sf $(ProjectBase)/MainAnalysis/23762_ActualUnfold/Output UnfoldedInput
+	ln -sf $(ProjectBase)/MainAnalysis/24236_RebinUnfoldInput//Output_R4 Input
+	ln -sf $(ProjectBase)/MainAnalysis/23762_ActualUnfold/Output_R4 UnfoldedInput
 	ln -sf $(ProjectBase)/MainAnalysis/GlobalSetting/GlobalSetting.dh
 
 Clean:
@@ -31,4 +33,6 @@ RunData: Execute
 	bash RunFile.sh PPData   Nominal 1 PPMC      Nominal
 
 Execute: GeneratePerfectData.cpp
-	CompileRootMacro GeneratePerfectData.cpp Execute
+	g++ GeneratePerfectData.cpp -o Execute `root-config --libs --cflags` \
+	-I$(ProjectBase)/CommonCode/include \
+	$(ProjectBase)/CommonCode/library/*.o 

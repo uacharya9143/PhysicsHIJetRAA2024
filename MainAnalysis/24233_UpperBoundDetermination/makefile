@@ -20,4 +20,6 @@ RunAll: Execute
 	bash RunAll.sh
 
 Execute: GetUpperBound.cpp
-	CompileRootMacro GetUpperBound.cpp Execute -I$(ProjectBase)/CommonCode/include
+	g++ GetUpperBound.cpp -o Execute `root-config --libs --cflags` \
+	-I$(ProjectBase)/CommonCode/include \
+	$(ProjectBase)/CommonCode/library/*.o 

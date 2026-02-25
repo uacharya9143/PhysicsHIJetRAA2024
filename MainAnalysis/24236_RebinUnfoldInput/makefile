@@ -3,7 +3,8 @@ default: TestRun
 
 Prepare:
 	rm -f Input
-	ln -sf $(ProjectBase)/MainAnalysis/23762_UnfoldPreparation/Output Input
+	#ln -sf $(ProjectBase)/MainAnalysis/23762_UnfoldPreparation/Output Input
+	ln -sf $(ProjectBase)/MainAnalysis/23762_UnfoldPreparation/Output_R4 Input
 	ln -sf $(ProjectBase)/MainAnalysis/GlobalSetting/GlobalSetting.dh .
 	mkdir -p Output 
 
@@ -16,4 +17,6 @@ TestRun: Execute
 		--DHFile GlobalSetting.dh
 
 Execute: Rebin.cpp
-	CompileRootMacro Rebin.cpp Execute -I../../CommonCode/include
+	g++ Rebin.cpp -o Execute -I../../CommonCode/include `root-config --libs --cflags` \
+	-I$(ProjectBase)/CommonCode/include \
+	$(ProjectBase)/CommonCode/library/*.o 

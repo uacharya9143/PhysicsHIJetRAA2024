@@ -39,9 +39,11 @@ do
       CLabel3=R${R}R${BaseR}_Centrality50to70
       CLabel4=R${R}R${BaseR}_Centrality50to90
 
-      PPLumi=`DHQuery GlobalSetting.dh Lumi ${PPState}_R${R}_CentralityInclusive_BRIL | tr -d '"' | DivideConst 1000000`
+      #PPLumi=`DHQuery GlobalSetting.dh Lumi ${PPState}_R${R}_CentralityInclusive_BRIL | tr -d '"' | DivideConst 1000000`
+      PPLumi=$(echo "scale=6; $(DHQuery GlobalSetting.dh Lumi ${PPState}_R${R}_CentralityInclusive_BRIL | tr -d '"') / 1000000" |bc)
       PPLumiUnit="pb^{-1}"
-      AALumi=`DHQuery GlobalSetting.dh Lumi ${AAState}_R${R}_Centrality0to10_BRIL | tr -d '"' | DivideConst 1000`
+      #AALumi=`DHQuery GlobalSetting.dh Lumi ${AAState}_R${R}_Centrality0to10_BRIL | tr -d '"' | DivideConst 1000`
+      AALumi=$(echo "scale=6; $(DHQuery GlobalSetting.dh Lumi ${AAState}_R${R}_Centrality0to10_BRIL | tr -d '"') / 1000" |bc)
       AALumiUnit="nb^{-1}"
 
       RValue1=`DHQuery GlobalSetting.dh JetR $BaseR`

@@ -8,7 +8,7 @@ Prepare:
 	ln -sf $(ProjectBase)/MainAnalysis/GlobalSetting/GlobalSetting.dh
 	ln -sf $(ProjectBase)/MainAnalysis/24114_PPRatioHEPData/ HEPData
 	ln -sf $(ProjectBase)/MainAnalysis/24165_SystematicsCombination/Output/ CombinedSystematics
-	ln -sf $(ProjectBase)/MainAnalysis/24263_StatisticalUncertaintyCancellation/StatisticsRho.dh .
+	ln -sf $(ProjectBase)/MainAnalysis/24263_StatisticalUncertaintyCancellation/StatisticsRho.dh . #disabled by uttam
 	mkdir -p Plots
 
 Clean:
@@ -18,8 +18,9 @@ RunJetPT: Execute
 	bash RunJetPT.sh
 
 Execute: MakePlot.cpp
-	CompileRootMacro MakePlot.cpp Execute -I../../CommonCode/include
-
+	g++ MakePlot.cpp -o Execute `root-config --libs --cflags` \
+	-I$(ProjectBase)/CommonCode/include \
+	$(ProjectBase)/CommonCode/library/*.o 
 Deploy:
 	mkdir -p $(DeployBase)/Result/PPRatio/
 	cp Plots/* $(DeployBase)/Result/PPRatio/

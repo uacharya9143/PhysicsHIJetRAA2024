@@ -1,12 +1,32 @@
 #!/bin/bash
-
+#set -euo pipefail
 PPState=$1
 PPSuffix=$2
 AAState=$3
 AASuffix=$4
-OutputTag=$5
+OutputTag=$5 
+
+num_or_default() {
+  # Usage: num_or_default "<cmd>" <default>
+  local cmd="$1" def="$2" out
+  # shellcheck disable=SC2086
+  out=$(eval "$cmd" | tr -d '"' | xargs)
+  if [[ -z "$out" ]]; then
+    echo "$def"
+  else
+    echo "$out"
+  fi
+}
+
+bc_calc() {
+  # Safe bc -l with scale, guarding empty inputs
+  # Usage: bc_calc "<expr>"
+  echo "$1" | bc -l
+}
 
 JetR=`DHQuery GlobalSetting.dh Global JetR | sed 's/"//g'`
+#JetR="1 2 3 4 6 7 8 9"; \
+JetR="4"; \
 Centrality=`DHQuery GlobalSetting.dh Global Centrality | sed 's/"//g'`
 
 for R in $JetR
@@ -38,10 +58,23 @@ do
    CLabel4=R${R}_Centrality70to90
    CLabel5=R${R}_Centrality50to90
 
-   PPLumi=`DHQuery GlobalSetting.dh Lumi ${PPState}_R${R}_CentralityInclusive_BRIL | tr -d '"' | DivideConst 1000000`
+   #PPLumi=`DHQuery GlobalSetting.dh Lumi ${PPState}_R${R}_CentralityInclusive_BRIL | tr -d '"' | DivideConst 1000000` #disabled by uttam
+   #PPLumi=$(echo "scale=6; $(DHQuery GlobalSetting.dh Lumi ${PPState}_R${R}_CentralityInclusive_BRIL | tr -d '"') / 1000000" | bc)
+   #PPLumi=$(echo "scale=6; $(DHQuery GlobalSetting.dh Lumi ${PPState}_R${R}_CentralityInclusive_BRIL | tr -d '"') / 1" | bc)
+   PPLumi=$(num_or_default "DHQuery GlobalSetting.dh Lumi ${PPState}_R${R}_CentralityInclusive_BRIL" "0")
+   PPLumi=$(printf "%.6f" "$PPLumi")
+   PPLumi=$(echo "scale=6; $PPLumi / 1000000" | bc)
    PPLumiUnit="pb^{-1}"
-   AALumi=`DHQuery GlobalSetting.dh Lumi ${AAState}_R${R}_Centrality0to10_BRIL | tr -d '"' | DivideConst 1000`
+   echo "PPLumi: $PPLumi"
+
+   #AALumi=`DHQuery GlobalSetting.dh Lumi ${AAState}_R${R}_Centrality0to10_BRIL | tr -d '"' | DivideConst 1000` #disabled by uttam
+   #AALumi=$(echo "scale=6; $(DHQuery GlobalSetting.dh Lumi ${AAState}_R${R}_Centrality0to10_BRIL | tr -d '"') / 1000" | bc)
+   #AALumi=$(echo "scale=6; $(DHQuery GlobalSetting.dh Lumi ${AAState}_R${R}_Centrality0to10_BRIL | tr -d '"') / 1" | bc)
+   AALumi=$(num_or_default "DHQuery GlobalSetting.dh Lumi ${AAState}_R${R}_Centrality0to10_BRIL" "0")
+   AALumi=$(printf "%.6f" "$AALumi")
+   AALumi=$(echo "scale=6; $AALumi / 1000" | bc)
    AALumiUnit="nb^{-1}"
+   echo "AALumi: $AALumi"
 
    if [[ "$PPLumi" == "" ]]; then
       PPLumi=0
@@ -64,10 +97,10 @@ do
       --AAName $AACurve0,$AACurve1,$AACurve2,$AACurve3,$AACurve4,$AACurve5 \
       --Systematics ${SysFile0},${SysFile1},${SysFile2},${SysFile3},${SysFile4},${SysFile5} \
       --Labels "0-10%","10-30%","30-50%","50-70%","70-90%","50-90%" \
-      --FinalOutput Plots/RAAR${R}_${OutputTag}.pdf \
-      --RootOutput Root/RAAR${R}_${OutputTag}.root \
+      --FinalOutput Plots_R4/RAAR${R}_${OutputTag}.pdf \
+      --RootOutput Root_R4/RAAR${R}_${OutputTag}.root \
       --CurveLabel $CLabel0,$CLabel1,$CLabel2,$CLabel3,$CLabel4,$CLabel5 \
-      --WorldXMin 158 --WorldXMax 1500 --WorldYMin 0.0 --WorldYMax 1.2 --LogX true --LogY false \
+      --WorldXMin 158 --WorldXMax 1000 --WorldYMin 0.0 --WorldYMax 1.2 --LogX true --LogY false \
       --XLabel "Jet p_{T} (GeV)" --YLabel "$YLabel" \
       --XAxisSpacing 505 --YAxisSpacing 505 \
       --LegendX 0.75 --LegendY 0.35 --LegendSize 0.040 \

@@ -13,6 +13,7 @@ using namespace std;
 #include "TLegend.h"
 #include "TGraphAsymmErrors.h"
 #include "TPaletteAxis.h"
+#include "TSystem.h"
 #include "TLatex.h"
 #include "TImage.h"
 
@@ -20,7 +21,7 @@ using namespace std;
 #include "CommandLine.h"
 #include "SetStyle.h"
 #include "CustomAssert.h"
-#include "RootUtilities.h"
+//#include "RootUtilities.h"
 
 #define MAX 1000
 
@@ -39,7 +40,7 @@ double CalculateIntegral(TGraphAsymmErrors &G, double MinX = -99999);
 
 int main(int argc, char *argv[])
 {
-   SilenceRoot();
+  //SilenceRoot();
 
    SetThesisStyle();
    vector<int> Colors = GetPrimaryColors();
@@ -358,11 +359,11 @@ int main(int argc, char *argv[])
    Canvas.cd();
 
    SomeH2->GetZaxis()->SetLabelSize(TextSize);
-   TPaletteAxis ColorBar(PadX0 + PadDX * VisibleColumn + PadCG, PadY0,
-      PadX0 + PadDX * VisibleColumn + PadCG + PadDC, PadY0 + PadDY * VisibleRow,
-      SomeH2);
-   ColorBar.SetLabelSize(TextSize);
-   ColorBar.Draw();
+   //TPaletteAxis ColorBar(PadX0 + PadDX * VisibleColumn + PadCG, PadY0,
+   //			 PadX0 + PadDX * VisibleColumn + PadCG + PadDC, PadY0 + PadDY * VisibleRow,
+   //			 SomeH2); //disabled by uttam due to PalletteAxiserror
+   // ColorBar.SetLabelSize(TextSize);
+   // ColorBar.Draw(); //disabled by uttam due to PalletteAxiserror
 
    if(LogZ == true)
       Canvas.SetLogz();

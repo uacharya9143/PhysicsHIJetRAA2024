@@ -19,7 +19,7 @@ using namespace std;
 #include "CommandLine.h"
 #include "SetStyle.h"
 #include "CustomAssert.h"
-#include "RootUtilities.h"
+//#include "RootUtilities.h"
 #include "DataHelper.h"
 
 int main(int argc, char *argv[]);
@@ -38,7 +38,7 @@ bool CheckInclude(string DHFileName, string FileName, string KeyBase);
 
 int main(int argc, char *argv[])
 {
-   SilenceRoot();
+  //SilenceRoot();
 
    SetThesisStyle();
    vector<int> Colors = GetPrimaryColors();

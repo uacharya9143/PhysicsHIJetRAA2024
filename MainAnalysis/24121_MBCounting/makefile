@@ -12,7 +12,10 @@ MergeMB:
 	hadd -f MergedMB1.root MB1Input/MBCounter*root
 
 Execute: GetMB.cpp
-	CompileRootMacro GetMB.cpp Execute
+	g++ GetMB.cpp -o Execute  `root-config --libs --cflags` \
+	-I$(ProjectBase)/CommonCode/include \
+	$(ProjectBase)/CommonCode/library/*.o
+
 
 RunAA: Execute
 	for i in Input/PbPbData_R*NominalFine_JSON.txt; do echo $$i; bash CheckJSON.sh $$i; done

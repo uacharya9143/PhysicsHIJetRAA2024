@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
    if(DoTrigger == true)
    {
       string Formula = DHFile["TriggerTurnOn"][TriggerBase+"_Formula"].GetString();
+      cout<<"FOrmula" << Formula <<" " << "Bin" <<Base<<endl;
       TF1 Function("Function", Formula.c_str(), 0, 1500);
       int N = DHFile["TriggerTurnOn"][TriggerBase+"_NParameter"].GetInteger();
       for(int i = 0; i < N; i++)

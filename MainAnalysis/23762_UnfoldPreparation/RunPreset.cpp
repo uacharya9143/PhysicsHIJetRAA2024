@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
    string JERSFFile          = CL.Get("JERSF", "none");
 
    string JetShift           = CL.Get("Shift", "0.0");
-   string JetSmear           = CL.Get("Smear", "0.025");
+   string JetSmear           = CL.Get("Smear", "0.0");//"0.025");
    string Flooring           = CL.Get("Flooring", "false");
 
    double EtaMin             = CL.GetDouble("EtaMin", -2.0);
@@ -69,8 +69,8 @@ int main(int argc, char *argv[])
          else
             cout << "time ./Execute --MC " << MCFile << " --Data " << DataFile;
          cout << " --MCFraction " << MCFraction << " --DataFraction " << DataFraction
-            << " --Output Output/" << Prefix << "_" << RC << "_" << Suffix << ".root"
-            << " --JSONOutput Output/" << Prefix << "_" << RC << "_" << Suffix << "_JSON.txt"
+            << " --Output Output_R4/" << Prefix << "_" << RC << "_" << Suffix << ".root"
+            << " --JSONOutput Output_R4/" << Prefix << "_" << RC << "_" << Suffix << "_JSON.txt"
             << " --ExportJSON true"
             << " --EtaMin " << EtaMin << " --EtaMax " << EtaMax
             << " --Observable JetPT --ObservableIndex -1 --Binning None --BinningIndex -1"
@@ -78,6 +78,7 @@ int main(int argc, char *argv[])
             << " --ObservableRecoBins " << Binnings["RecoBins"]
             << " --ObservableGenMin " << GenMin
             << " --ObservableRecoMin " << RecoMin
+	   //            << " --BinningGenBins 0,1 --BinningRecoBins 0,1"
             << " --BinningGenBins 0,1 --BinningRecoBins 0,1"
             << " --ObservableShift " << JetShift
             << " --ObservableSmear " << JetSmear

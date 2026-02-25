@@ -42,9 +42,9 @@ int main(int argc, char *argv[])
       int Best = -1;
       for(int i = 0; i < (int)Iterations.size(); i++)
       {
-         if(Iterations[i] < Reference || Best < 0)
+         if(Iterations[i] < Reference )
          {
-            if(Iterations[i] > Best)
+            if(Iterations[i] > Best|| Best < 0)
                Best = Iterations[i];
          }
       }

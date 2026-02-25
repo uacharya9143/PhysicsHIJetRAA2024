@@ -42,7 +42,19 @@ TestRunOld: Execute
 		--GroupX 1 --GroupY 1 --Row 1 --Column 1
 
 Execute: MakePaperPlot.cpp
-	CompileRootMacro MakePaperPlot.cpp Execute
+	#g++ MakePaperPlot.cpp -o Execute `root-config --libs --cflags` \
+
+	#g++ MakePaperPlot.cpp -o Execute `root-config --libs` -lGpad -lGraf \
+	#-I$(ProjectBase)/CommonCode/include \
+	#$(ProjectBase)/CommonCode/library/*.o \
+	#`root-config --cflags` 
+
+	g++ `root-config --cflags` \
+	-I$(ProjectBase)/CommonCode/include \
+	MakePaperPlot.cpp \
+	$(ProjectBase)/CommonCode/library/*.o \
+	-o Execute \
+	`root-config --libs` -lGpad -lGraf
 
 Deploy:
 	mkdir -p $(DeployBase)/Matrix/

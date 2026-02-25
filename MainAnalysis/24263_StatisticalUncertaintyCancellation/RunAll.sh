@@ -47,7 +47,7 @@ do
       #    --DHOutput StatisticsRho.dh --DHState RecoPbPbR${R1}R${R2}
 
       # Run PbPb Data
-      JECBase=$ProjectBase/CommonCode/jec/Autumn18_HI_RAAV2_DATA/Autumn18_HI_RAAV2_DATA
+      JECBase=$ProjectBase/CommonCode/jec/Summer2024_PbPb5p36TeV_MC/Summer2024_PbPb5p36TeV_MC
       ./Execute --Input `find $PbPbDataBase | grep root | head -n $NFile | tr '\n' ','` \
          --Tree1 "akCs${R1}PFJetAnalyzer/t" \
          --Tree2 "akCs${R2}PFJetAnalyzer/t" \
@@ -73,5 +73,3 @@ do
       #    --DHOutput Rho.dh --DHState PPR${R1}R${R2}
    done
 done
-
-

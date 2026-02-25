@@ -12,7 +12,7 @@ using namespace std;
 #include "CommandLine.h"
 #include "PlotHelper4.h"
 #include "SetStyle.h"
-#include "RootUtilities.h"
+//#include "RootUtilities.h"
 
 #include "BinHelper.h"
 
@@ -23,7 +23,7 @@ void SetMinMax(TGraph &G);
 
 int main(int argc, char *argv[])
 {
-   SilenceRoot();
+  //SilenceRoot();
 
    SetThumbStyle();
 

@@ -3,7 +3,8 @@ default: TestRun
 
 Prepare:
 	rm -f Input
-	ln -sf $(ProjectBase)/MainAnalysis/23762_ActualUnfold/Output Input
+	#ln -sf $(ProjectBase)/MainAnalysis/23762_ActualUnfold/Output Input
+	ln -sf $(ProjectBase)/MainAnalysis/23762_ActualUnfold/Output_R4 Input
 	ln -sf $(ProjectBase)/MainAnalysis/GlobalSetting/GlobalSetting.dh .
 	mkdir -p Output
 
@@ -46,13 +47,19 @@ TestRun: Execute
 		--State Iterations --Key PPData_R4_CentralityInclusive_Nominal_DefaultStep1Prior
 
 Execute: PlotIteration.cpp
-	CompileRootMacro PlotIteration.cpp Execute -I../../CommonCode/include
+	g++ PlotIteration.cpp -o Execute `root-config --libs --cflags` \
+	-I../../CommonCode/include \
+	$(ProjectBase)/CommonCode/library/*.o 
 
 ExecuteLCurve: PlotLCurve.cpp
-	CompileRootMacro PlotLCurve.cpp ExecuteLCurve -I../../CommonCode/include
+	g++ PlotLCurve.cpp -o ExecuteLCurve `root-config --libs --cflags` \
+	-I../../CommonCode/include \
+	$(ProjectBase)/CommonCode/library/*.o 
 
 ExecutePlot: MakeSummaryPlot.cpp
-	CompileRootMacro MakeSummaryPlot.cpp ExecutePlot
+	g++ MakeSummaryPlot.cpp -o ExecutePlot `root-config --libs --cflags` \
+	-I../../CommonCode/include \
+	$(ProjectBase)/CommonCode/library/*.o 
 
 RunPlot: ExecutePlot
 	./ExecutePlot --DHFile GlobalSetting.dh --Output IterationMC.pdf --PPBase PPMC --AABase PbPbMCRho

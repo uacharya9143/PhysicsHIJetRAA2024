@@ -14,5 +14,6 @@ RunAll: Execute
 	bash RunAll.sh
 
 Execute: GetLowerBound.cpp
-	CompileRootMacro GetLowerBound.cpp Execute \
-		-I$(ProjectBase)/CommonCode/include/
+	g++ GetLowerBound.cpp -o Execute `root-config --libs --cflags` \
+		-I$(ProjectBase)/CommonCode/include/ \
+		$(ProjectBase)/CommonCode/library/*.o 

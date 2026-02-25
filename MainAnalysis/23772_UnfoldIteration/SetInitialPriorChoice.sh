@@ -1,6 +1,7 @@
 #!/bin/bash
 
-JetR=`DHQuery GlobalSetting.dh Global JetR | tr -d '"'`
+#JetR=`DHQuery GlobalSetting.dh Global JetR | tr -d '"'`
+JetR="1 2 3 4 6 7 8 9"; \
 Centrality=`DHQuery GlobalSetting.dh Global Centrality | tr -d '"'`
 
 for R in $JetR

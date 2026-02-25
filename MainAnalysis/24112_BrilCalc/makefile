@@ -1,13 +1,15 @@
+#source /cvmfs/cms-bril.cern.ch/cms-lumi-pog/brilws-docker/brilws-env
+#export PATH=$HOME/.local/bin:/cvmfs/cms.cern.ch/cms-lumi-pog/brilconda/bin:$PATH
 
 
 Prepare:
 	rm -f Input
-	ln -sf $(ProjectBase)/MainAnalysis/24236_RebinUnfoldInput//Output Input
+	ln -sf $(ProjectBase)/MainAnalysis/23762_UnfoldPreparation//Output Input
 	ln -sf $(ProjectBase)/MainAnalysis/GlobalSetting/GlobalSetting.dh
 
 RunPP:
-	# for i in Input/PPData_R*NominalFine_JSON.txt; do bash CheckJSON.sh $$i; done
-	for i in Input/PPDataEOY_R*NominalFine_JSON.txt; do bash CheckJSON.sh $$i; done
+	for i in Input/PPData_R*NominalFine_JSON.txt; do bash CheckJSON_pp.sh $$i; done
+#	 for i in Input/PPData_R1_CentralityInclusive_NominalFine_JSON.txt; do bash CheckJSON.sh $$i; done
 
 RunPPTierCheck:
 	# for i in Input/FlatMiniAOD/PPData_R*NominalFine_JSON.txt; do bash CheckJSON.sh $$i MiniAOD.dh; done

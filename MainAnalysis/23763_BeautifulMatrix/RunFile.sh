@@ -3,7 +3,8 @@ Prefix=$1
 Suffix=$2
 IsPP=$3
 
-JetR=`DHQuery GlobalSetting.dh Global JetR | sed 's/"//g'`
+#JetR=`DHQuery GlobalSetting.dh Global JetR | sed 's/"//g'`
+JetR="1 2 3 4 6 7 8 9"; \
 Centrality=`DHQuery GlobalSetting.dh Global Centrality | sed 's/"//g'`
 if [[ "$IsPP" == "1" ]]; then
    Centrality="Inclusive"
@@ -35,8 +36,15 @@ do
       if [[ "$IsPP" == "1" ]]; then
          CentralityString=" "
       else
-         CentralityMin=`DHQuery GlobalSetting.dh CentralityMin ${C} | tr -d '"' | MultiplyConst 100`
-         CentralityMax=`DHQuery GlobalSetting.dh CentralityMax ${C} | tr -d '"' | MultiplyConst 100`
+          #CentralityMin=`DHQuery GlobalSetting.dh CentralityMin ${C} | tr -d '"' | MultiplyConst 100`
+         #CentralityMax=`DHQuery GlobalSetting.dh CentralityMax ${C} | tr -d '"' | MultiplyConst 100`
+	  CentralityMin=$(echo "$(DHQuery GlobalSetting.dh CentralityMin ${C} | tr -d '"')" \* 100 | bc)
+          CentralityMin=$(echo "$(DHQuery GlobalSetting.dh CentralityMin ${C} | tr -d '"')" \* 100 | bc)
+	  
+#CentralityMin=`DHQuery GlobalSetting.dh CentralityMin ${C} | tr -d '"'* 100`
+         #CentralityMax=`DHQuery GlobalSetting.dh CentralityMax ${C} | tr -d '"' * 100`
+
+	  
          CentralityString="Centrality ${CentralityMin}%-${CentralityMax}%"
       fi
 

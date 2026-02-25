@@ -13,11 +13,11 @@ using namespace std;
 #include "CommandLine.h"
 #include "PlotHelper4.h"
 #include "SetStyle.h"
-#include "RootUtilities.h"
+//#include "RootUtilities.h"
 
 int main(int argc, char *argv[])
 {
-   SilenceRoot();
+  //SilenceRoot();
 
    SetThesisStyle();
    vector<int> Colors = GetPrimaryColors();
@@ -108,8 +108,8 @@ int main(int argc, char *argv[])
       HVariation[i]->Divide(HBase[i]);
       HVariation[i]->SetStats(0);
       HVariation[i]->GetYaxis()->SetTitle("Ratio to nominal");
-      HVariation[i]->SetMinimum(0.00);
-      HVariation[i]->SetMaximum(2.00);
+      HVariation[i]->SetMinimum(0.40);
+      HVariation[i]->SetMaximum(1.60);
       HVariation[i]->Draw();
       HVariation[i]->Draw("hist same");
       GLine.Draw("l");

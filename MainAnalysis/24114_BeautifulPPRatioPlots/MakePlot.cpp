@@ -17,7 +17,7 @@ using namespace std;
 #include "CustomAssert.h"
 #include "DataHelper.h"
 #include "SetStyle.h"
-#include "RootUtilities.h"
+//#include "RootUtilities.h"
 
 #include "BinHelper.h"
 
@@ -30,7 +30,7 @@ int GetBin(double Value, vector<double> &BinBoundary);
 
 int main(int argc, char *argv[])
 {
-   SilenceRoot();
+  //SilenceRoot();
 
    SetThesisStyle();
    vector<int> Colors = GetPrimaryColors();
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
    Assert(FileCount > 0, "Please specify at least one curve to plot");
    Assert(FileCount == RLabel.size(), "Please specify the radius labels for the input files");
    Assert(FileCount == SysName.size(), "We need systematics for all the files.  Put \"none\" to bypass for given curve");
-   Assert(FileCount == StatDHState.size(), "Stat reduction rho state count wrong.");
+   //Assert(FileCount == StatDHState.size(), "Stat reduction rho state count wrong.");
 
    // Get the global setting DH file
    string GlobalSettingFile  = CL.Get("GlobalSetting", "GlobalSetting.dh");
@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
    Canvas.SetLogx();
 
    TH2D HWorld("HWorld", Form(";Jet p_{T} (GeV);#sigma(R = X) / #sigma(R = %.1f)", DHFile["JetR"][BaseRLabel].GetDouble()),
-      100, XMin, XMax, 100, 0, 1.2);
+      100, XMin, XMax, 100, 0, 1.4);
    HWorld.SetStats(0);
    HWorld.GetXaxis()->SetMoreLogLabels();
 
@@ -211,12 +211,12 @@ int main(int argc, char *argv[])
       }
    }
 
-   TLegend Legend(0.15, 0.12, 0.30, 0.12 + 0.035 * (FileCount > 5 ? 5 : FileCount));
+   TLegend Legend(0.15, 0.70, 0.30, 0.70 + 0.035 * (FileCount > 5 ? 5 : FileCount));
    Legend.SetTextSize(0.035);
    Legend.SetFillStyle(0);
    Legend.SetBorderSize(0);
    
-   TLegend Legend2(0.35, 0.12, 0.50, 0.12 + 0.035 * (FileCount > 5 ? FileCount - 5: 1));
+   TLegend Legend2(0.35, 0.70, 0.50, 0.70 + 0.035 * (FileCount > 5 ? FileCount - 5: 1));
    Legend2.SetTextSize(0.035);
    Legend2.SetFillStyle(0);
    Legend2.SetBorderSize(0);
@@ -266,8 +266,9 @@ int main(int argc, char *argv[])
 
    Latex.SetTextAlign(12);
    Latex.DrawLatex(0.10, 0.92, "CMS #font[52]{Preliminary}");
+   //Latex.DrawLatex(0.10, 0.92, "Work in Progress");
    Latex.SetTextAlign(32);
-   Latex.DrawLatex(0.85, 0.92, Form("pp 5.02 TeV %.2f %s", Luminosity, LuminosityUnit.c_str()));
+   Latex.DrawLatex(0.85, 0.92, Form("pp 5.36 TeV %.2f %s", Luminosity, LuminosityUnit.c_str()));
    
    // Latex.SetTextAlign(12);
    // Latex.DrawLatex(0.12, 0.87, "Statistical only");

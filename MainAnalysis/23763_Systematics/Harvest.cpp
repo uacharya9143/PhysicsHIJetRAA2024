@@ -7,7 +7,7 @@ using namespace std;
 
 #include "CustomAssert.h"
 #include "CommandLine.h"
-#include "RootUtilities.h"
+//#include "RootUtilities.h"
 #include "DataHelper.h"
 
 int main(int argc, char *argv[]);
@@ -22,7 +22,7 @@ void DoBridgingPattern3(TH1D *HB, TH1D *H);
 
 int main(int argc, char *argv[])
 {
-   SilenceRoot();
+  // SilenceRoot();
 
    CommandLine CL(argc, argv);
 

@@ -2,12 +2,18 @@ default: RunJetPT RunJetPTClosure
 
 Prepare:
 	rm -f OriginalInput Input Systematics HEPData
-	ln -sf $(ProjectBase)/MainAnalysis/24236_RebinUnfoldInput//Output OriginalInput
-	ln -sf $(ProjectBase)/MainAnalysis/23762_ActualUnfold/Output Input
-	ln -sf $(ProjectBase)/MainAnalysis/23763_Systematics/Output Systematics
+# 	ln -sf $(ProjectBase)/MainAnalysis/24236_RebinUnfoldInput//Output OriginalInput
+# 	ln -sf $(ProjectBase)/MainAnalysis/23762_ActualUnfold/Output Input
+# 	ln -sf $(ProjectBase)/MainAnalysis/23763_Systematics/Output Systematics
+
+	ln -sf $(ProjectBase)/MainAnalysis/24236_RebinUnfoldInput//Output_R4 OriginalInput
+	ln -sf $(ProjectBase)/MainAnalysis/23762_ActualUnfold/Output_R4 Input
+	ln -sf $(ProjectBase)/MainAnalysis/23763_Systematics/Output_R4 Systematics
+
 	ln -sf $(ProjectBase)/MainAnalysis/GlobalSetting/GlobalSetting.dh
 	ln -sf $(ProjectBase)/MainAnalysis/24113_HEPData/ HEPData
 	mkdir -p Plots Root
+	mkdir -p Plots_R4 Root_R4
 
 Clean:
 	rm -f Plots/*pdf
@@ -16,6 +22,11 @@ Clean:
 RunJetPT: Execute
 	bash RunFile.sh PbPbData Nominal "" 0 Gen
 	bash RunFile.sh PPData   Nominal "" 1 Gen
+
+	bash RunFile.sh PPData   Nominal "" 1 InputReco
+	bash RunFile.sh PPData   Nominal "" 1 Reco
+	bash RunFile.sh PbPbData Nominal "" 0 InputReco
+	bash RunFile.sh PbPbData Nominal "" 0 Reco
 
 RunJetPTReco: Execute
 	bash RunFile.sh PbPbData  Nominal ""  0 Reco
@@ -68,9 +79,16 @@ RunCheck: Execute
 RunJetPTClosure: Execute
 	bash RunFile.sh PbPbMCRho Nominal Toy 0 Gen
 	bash RunFile.sh PPMC      Nominal Toy 1 Gen
+	
+	bash RunFile.sh PPMC      Nominal Toy 1 InputReco
+	bash RunFile.sh PbPbMCRho Nominal Toy 0 InputReco
+	bash RunFile.sh PbPbMCRho Nominal Toy 0 Reco
+	bash RunFile.sh PPMC      Nominal Toy 1 Reco
 
 Execute: MakePaperPlot.cpp
-	CompileRootMacro MakePaperPlot.cpp Execute
+	g++ MakePaperPlot.cpp -o Execute  `root-config --libs --cflags` \
+	-I$(ProjectBase)/CommonCode/include \
+	$(ProjectBase)/CommonCode/library/*.o 
 
 Deploy:
 	mkdir -p $(DeployBase)/Result/Spectra/

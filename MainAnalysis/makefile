@@ -20,10 +20,11 @@ RunPart1B:
 	# (cd 23775_CentralityWeights && make Prepare TestRun)
 	(cd 24155_UEMatchingWeight  && make Prepare RunAll FitAll)
 	(cd 23752_CopyJetFromForest && make Prepare SubmitAfterRho)
+	(cd 24263_StatisticalUncertaintyCancellation && make Prepare RunAll) #added by Uttam later for StatisticalRho.dh
 	SleepUntilDone.sh
 
 RunPart1C:
-	(cd 23752_CopyJetFromForest && make Prepare DeleteAndMerge)
+	#(cd 23752_CopyJetFromForest && make Prepare DeleteAndMerge)
 	(cd 23762_UnfoldPreparation && make Prepare RunPP RunAA)
 	(cd 24112_BrilCalc          && make Prepare RunPP RunAA)
 	(cd 24121_MBCounting        && make Prepare MergeMB RunAA)
@@ -62,7 +63,7 @@ RunPart2A:
 	(cd 24236_RebinUnfoldInput         && make Prepare RunAll)
 	(cd 24232_LowerBoundDetermination  && make Prepare RunAll)
 	(cd 24233_UpperBoundDetermination  && make Prepare RunAll)
-	(cd 24165_PUBugCorrection          && make Prepare PlaceHolder)
+	(cd 24165_PUBugCorrection          && make Prepare PlaceHolder) #not needed for now
 	(cd 24231_EventSelectionEfficiency && make Prepare SetEfficiency)
 	(cd 24233_OfficialMBCount          && make Prepare RunAll)
 	(cd 23772_UnfoldIteration          && make Prepare SetDefault)
@@ -87,28 +88,6 @@ RunPart2A:
 	# (cd 23762_ActualUnfold             && make Prepare RunPPStep2 RunAAStep2)
 	# (cd 23762_ActualUnfold             && make Prepare RunSetDHFileStep2)
 
-RunPart2AOld:
-	#########################################################################
-	# Make sure to copy over the following from lxplus before continuing... #
-	#    1. unfold preparation output files                                 #
-	#    2. GlobalSetting.dh                                                #
-	# Also make sure that the ProjectBase is set correctly!                 #
-	#########################################################################
-	sleep 10
-	(cd 24232_LowerBoundDetermination  && make Prepare RunAll)
-	(cd 24233_UpperBoundDetermination  && make Prepare RunAll)
-	(cd 24165_PUBugCorrection          && make Prepare PlaceHolder)
-	(cd 24231_EventSelectionEfficiency && make Prepare SetEfficiency)
-	(cd 24233_OfficialMBCount          && make Prepare RunAll)
-	(cd 23772_UnfoldIteration          && make Prepare SetDefault)
-	(cd 23762_PerfectRecoGeneration    && make Prepare RunMC)
-	(cd 23762_FakeData                 && make Prepare RunMC)
-	(cd 23762_ActualUnfold             && make Prepare RunAA RunPP)
-	(cd 23772_UnfoldIteration          && make Prepare RunMC)
-	(cd 23762_PerfectRecoGeneration    && make Prepare RunData)
-	(cd 23762_FakeData                 && make Prepare RunData)
-	(cd 23762_ActualUnfold             && make Prepare RunDataToy)
-	(cd 23772_UnfoldIteration          && make Prepare RunData)
 
 RunPart2B:
 	(cd 24113_HEPData                  && make default)
@@ -140,6 +119,31 @@ RunPart2E:
 
 RunPart2F:   # Things that are good to have but not essential in any way
 	(cd 24231_ConditionNumber          && make Prepare RunOther)
+###################################################################################
+###################################################################################
 
 
-
+RunPart2AOld:
+	#########################################################################
+	# Make sure to copy over the following from lxplus before continuing... #
+	#    1. unfold preparation output files                                 #
+	#    2. GlobalSetting.dh                                                #
+	# Also make sure that the ProjectBase is set correctly!                 #
+	#########################################################################
+	sleep 10
+	(cd 24232_LowerBoundDetermination  && make Prepare RunAll)
+	(cd 24233_UpperBoundDetermination  && make Prepare RunAll)
+	(cd 24165_PUBugCorrection          && make Prepare PlaceHolder)
+	(cd 24231_EventSelectionEfficiency && make Prepare SetEfficiency)
+	(cd 24233_OfficialMBCount          && make Prepare RunAll)
+	(cd 23772_UnfoldIteration          && make Prepare SetDefault)
+	(cd 23762_PerfectRecoGeneration    && make Prepare RunMC)
+	(cd 23762_FakeData                 && make Prepare RunMC)
+	(cd 23762_ActualUnfold             && make Prepare RunAA RunPP)
+	(cd 23772_UnfoldIteration          && make Prepare RunMC)
+	(cd 23762_PerfectRecoGeneration    && make Prepare RunData)
+	(cd 23762_FakeData                 && make Prepare RunData)
+	(cd 23762_ActualUnfold             && make Prepare RunDataToy)
+	(cd 23772_UnfoldIteration          && make Prepare RunData)
+###################################################################################
+###################################################################################

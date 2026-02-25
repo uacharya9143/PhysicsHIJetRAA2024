@@ -8,7 +8,7 @@ using namespace std;
 #include "TKey.h"
 
 #include "CommandLine.h"
-#include "Code/DrawRandom.h"
+#include "DrawRandom.h"
 
 int main(int argc, char *argv[]);
 double GetRandom(TH1D *H);

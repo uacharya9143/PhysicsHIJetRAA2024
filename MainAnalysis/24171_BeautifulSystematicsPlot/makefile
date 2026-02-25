@@ -34,7 +34,9 @@ RunAll: Execute
 	bash RunAll.sh
 
 Execute: MakePaperPlot.cpp
-	CompileRootMacro MakePaperPlot.cpp Execute
+	g++ MakePaperPlot.cpp -o Execute  `root-config --libs --cflags` \
+	-I$(ProjectBase)/CommonCode/include \
+	$(ProjectBase)/CommonCode/library/*.o 
 
 Deploy:
 	mkdir -p $(DeployBase)/Systematics/Spectra

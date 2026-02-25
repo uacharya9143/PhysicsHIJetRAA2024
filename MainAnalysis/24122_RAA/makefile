@@ -3,17 +3,22 @@ default: RunRAA RunRRAA RunRCP Deploy
 
 Prepare:
 	rm -f SpectraRoot CombinedSystematics
-	ln -sf $(ProjectBase)/MainAnalysis/23763_BeautifulPlots/Root SpectraRoot
+	#ln -sf $(ProjectBase)/MainAnalysis/23763_BeautifulPlots/Root SpectraRoot
+	ln -sf $(ProjectBase)/MainAnalysis/23763_BeautifulPlots/Root_R4 SpectraRoot
 	ln -sf $(ProjectBase)/MainAnalysis/GlobalSetting/GlobalSetting.dh .
-	ln -sf $(ProjectBase)/MainAnalysis/24165_SystematicsCombination/Output/ CombinedSystematics
-	ln -sf $(ProjectBase)/MainAnalysis/24263_StatisticalUncertaintyCancellation/StatisticsRho.dh .
+	#ln -sf $(ProjectBase)/MainAnalysis/24165_SystematicsCombination/Output/ CombinedSystematics
+	ln -sf $(ProjectBase)/MainAnalysis/24165_SystematicsCombination/Output_R4/ CombinedSystematics
+	ln -sf $(ProjectBase)/MainAnalysis/24263_StatisticalUncertaintyCancellation/StatisticsRho.dh . #disabled by uttam
 	mkdir -p Plots Root
+	mkdir -p Plots_R4 Root_R4
 
 Clean:
 	rm -f Plots/*pdf Root/*root
 
 RunRAA: Execute
 	bash RunFile.sh PPData Nominal PbPbData Nominal
+	bash RunFile.sh PPData Nominal PbPbData Nominal_Reco
+	bash RunFile.sh PPData Nominal PbPbData Nominal_InputReco
 
 RunRAACheck: RunRAAVariationCheck RunRAARecoCheck
 
@@ -67,7 +72,9 @@ RunRRAA: Execute
 	bash RunRRAAAlternate.sh PPData Nominal PbPbData Nominal
 
 Execute: PlotRAA.cpp
-	CompileRootMacro PlotRAA.cpp Execute -I../../CommonCode/include
+	g++ PlotRAA.cpp -o Execute `root-config --libs --cflags` \
+	-I$(ProjectBase)/CommonCode/include \
+	$(ProjectBase)/CommonCode/library/*.o 
 
 Deploy:
 	mkdir -p $(DeployBase)/Result/RAA

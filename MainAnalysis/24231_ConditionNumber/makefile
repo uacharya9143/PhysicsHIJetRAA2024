@@ -7,10 +7,14 @@ Prepare:
 	ln -sf $(ProjectBase)/MainAnalysis/GlobalSetting/GlobalSetting.dh .
 
 Execute: EvaluateConditionNumber.cpp
-	CompileRootMacro EvaluateConditionNumber.cpp Execute
+	g++ EvaluateConditionNumber.cpp -o Execute `root-config --libs --cflags` \
+	-I../../CommonCode/include/ \
+	../../CommonCode/library/*.o
 
 ExecutePlot: MakeSummaryPlot.cpp
-	CompileRootMacro MakeSummaryPlot.cpp ExecutePlot
+	g++ MakeSummaryPlot.cpp -o ExecutePlot `root-config --libs --cflags` \
+	-I../../CommonCode/include/ \
+	../../CommonCode/library/*.o
 
 TestRun: Execute
 	./Execute --Input Input/PbPbData_R4_Centrality50to90_Nominal.root --Response HResponse --DHFile Condition.dh
